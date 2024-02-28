@@ -1,6 +1,5 @@
 package com.example.gymAp.model;
 
-import io.swagger.models.Operation;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
