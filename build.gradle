@@ -48,6 +48,9 @@ dependencies {
 	testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.10.0'
 	testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '5.10.0'
 
+	implementation group: 'io.micrometer', name: 'micrometer-registry-prometheus', version: '1.12.3'
+	implementation group: 'io.micrometer', name: 'micrometer-core', version: '1.12.3'
+
 
 
 }

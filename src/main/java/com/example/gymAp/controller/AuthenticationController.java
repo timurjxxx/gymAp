@@ -10,7 +10,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
-//@Api(value = "Authentication Controller", description = "Endpoints for user authentication")
 public class AuthenticationController {
 
 
@@ -23,7 +22,6 @@ public class AuthenticationController {
 
 
     @GetMapping("/sign_in")
-//    @ApiOperation(value = "Login in to profile ")
     public ResponseEntity<?> login(@RequestBody Map<String, String> cred) {
         String username = cred.get("username");
         String password = cred.get("password");
