@@ -32,7 +32,6 @@ public class AuthenticationController {
 
     }
 
-//    @ApiOperation(value = "Change")
     @PutMapping(value = "/changeLogin", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> changeLogin(@RequestBody Map<String, String> cred) {
         String username = cred.get("username");

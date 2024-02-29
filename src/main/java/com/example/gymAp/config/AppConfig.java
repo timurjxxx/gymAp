@@ -9,13 +9,13 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 
-@Configuration
-@ComponentScan("com.example.gymAp")
-@EnableTransactionManagement
-@EnableAspectJAutoProxy
-@EnableJpaRepositories(basePackages = "com.example.gymAp.dao")
-@PropertySource(value = "classpath:application.properties")
-public class AppConfig implements WebMvcConfigurer {
-
-
-}
+//@Configuration
+//@ComponentScan("com.example.gymAp")
+//@EnableTransactionManagement
+//@EnableAspectJAutoProxy
+//@EnableJpaRepositories(basePackages = "com.example.gymAp.dao")
+//@PropertySource(value = "classpath:application.properties")
+//public class AppConfig implements WebMvcConfigurer {
+//
+//
+//}
