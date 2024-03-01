@@ -14,7 +14,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "/training", produces = MediaType.APPLICATION_JSON_VALUE)
-//@Api(value = "Training Controller", description = "Operations related to training management")
 public class TrainingController {
 
     private final TrainingService trainingService;
@@ -28,7 +27,6 @@ public class TrainingController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-//    @ApiOperation(value = "Create a new training", response = ResponseEntity.class)
     public ResponseEntity<Void> createTraining(@RequestBody Training training) {
 
         String trainerName = training.getTrainer().getUser().getUserName();
@@ -41,7 +39,6 @@ public class TrainingController {
 
     @Authenticated
     @GetMapping(value = "/trainee", consumes = MediaType.APPLICATION_JSON_VALUE)
-//    @ApiOperation(value = "Get trainee trainings by criteria", response = ResponseEntity.class)
     public ResponseEntity<String> getTraineeTrainingsByCriteria(@RequestHeader("username") String username, @RequestHeader("password") String password, @RequestBody TrainingSearchCriteria criteria) {
 
         List<Training> trainings = trainingService.getTraineeTrainingsByCriteria(username, criteria);
@@ -51,7 +48,6 @@ public class TrainingController {
 
     @Authenticated
     @GetMapping(value = "/trainer", consumes = MediaType.APPLICATION_JSON_VALUE)
-//    @ApiOperation(value = "Get trainer trainings by criteria", response = ResponseEntity.class)
     public ResponseEntity<String> getTrainerTrainingsByCriteria(@RequestHeader("username") String username, @RequestHeader("password") String password, @RequestBody TrainingSearchCriteria criteria) {
 
         List<Training> trainings = trainingService.getTrainerTrainingsByCriteria(username, criteria);

@@ -14,7 +14,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/trainer", produces = MediaType.APPLICATION_JSON_VALUE)
-//@Api(value = "Trainer Controller", description = "Operations related to trainer management")
 public class TrainerController {
 
 
@@ -26,7 +25,6 @@ public class TrainerController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-//    @ApiOperation(value = "Create a new trainer", response = ResponseEntity.class)
     public ResponseEntity<String> createTrainer(@RequestBody Trainer trainer) {
 
         Trainer createdTrainee = trainerService.createTrainer(trainer, trainer.getUser(), trainer.getSpecialization().getTrainingTypeName());
@@ -36,7 +34,6 @@ public class TrainerController {
 
     @Authenticated
     @GetMapping("/get_Trainer")
-//    @ApiOperation(value = "Get trainer profile by username", response = ResponseEntity.class)
     public ResponseEntity<String> getTrainerProfile(@RequestHeader("username") String username,@RequestHeader("password") String password) {
 
         Trainer trainer = trainerService.selectTrainerByUserName(username);
@@ -51,14 +48,12 @@ public class TrainerController {
 
     @Authenticated
     @PutMapping(value = "/update_Trainer", consumes = MediaType.APPLICATION_JSON_VALUE)
-//    @ApiOperation(value = "Update trainer profile by username", response = ResponseEntity.class)
     public ResponseEntity<String> updateTrainerProfile(@RequestHeader("username") String username, @RequestHeader("password") String password, @RequestBody Trainer trainer) {
         Trainer updatedTrainee = trainerService.updateTrainer(trainer.getUser().getUserName(), trainer);
         return ResponseEntity.ok(updatedTrainee.toString());
     }
     @Authenticated
     @GetMapping("/get_Trainers")
-//    @ApiOperation(value = "Get not assigned active trainers", response = ResponseEntity.class)
     public ResponseEntity<String> getNotAssignedActiveTrainers(@RequestHeader("username") String userName,@RequestHeader("password") String password) {
 
         List<Trainer> trainer = trainerService.getNotAssignedActiveTrainers(userName);
@@ -73,7 +68,6 @@ public class TrainerController {
 
     @Authenticated
     @PatchMapping(value = "/change_status", consumes = MediaType.APPLICATION_JSON_VALUE)
-//    @ApiOperation(value = "Activate or deactivate trainer by username", response = ResponseEntity.class)
     public ResponseEntity<Void> activateDeactivateTrainer(@RequestHeader("username") String username,@RequestHeader("password") String password, @RequestBody Map<String, String> jsonData) {
         trainerService.changeStatus(jsonData.get("username"));
         return ResponseEntity.ok().build();

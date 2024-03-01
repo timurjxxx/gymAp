@@ -18,9 +18,7 @@ public interface TrainerDAO extends JpaRepository<Trainer, Long> {
     Optional<Trainer> findTrainerByUserUserName(String username);
 
 
-    void deleteTrainerByUserUserName(String username);
 
-    boolean existsTrainerByUser_Id(Long id);
 
     @EntityGraph(value = "Trainer.fullGraph", type = EntityGraph.EntityGraphType.FETCH)
     @Query("SELECT t FROM Trainer t WHERE t.user.isActive = true AND t NOT IN (SELECT tt FROM Trainee tr JOIN tr.trainers tt WHERE tr.user.userName = :username)")
