@@ -25,7 +25,6 @@ public class DatabaseMetrics {
 
     @Autowired
     public DatabaseMetrics(MeterRegistry registry) {
-        // Initialize metrics with Micrometer's registry
         this.failedQueries = Counter.builder("database_failed_queries")
                 .description("Number of failed database queries")
                 .register(registry);
