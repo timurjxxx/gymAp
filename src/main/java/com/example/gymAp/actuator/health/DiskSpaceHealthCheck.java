@@ -9,7 +9,7 @@ import java.io.File;
 public class DiskSpaceHealthCheck extends BaseHealthCheck {
 
     @Override
-    protected Health checkHealth() {
+    public Health checkHealth() {
         long availableSpace = new File(".").getUsableSpace();
         if (availableSpace < 1024 * 1024 * 1024) { // 1 GB
             return Health.down().withDetail("reason", "Low disk space").build();

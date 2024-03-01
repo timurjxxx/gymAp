@@ -14,5 +14,5 @@ public abstract class BaseHealthCheck implements HealthIndicator {
         }
     }
 
-    protected abstract Health checkHealth() throws Exception;
+    public abstract Health checkHealth() throws Exception;
 }

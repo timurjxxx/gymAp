@@ -6,7 +6,9 @@ import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 
 @Component
@@ -21,15 +23,24 @@ public class NonEmptyTableHealthCheck extends BaseHealthCheck {
     }
 
     @Override
-    protected Health checkHealth() throws SQLException {
+    public Health checkHealth() throws SQLException {
         try (Connection connection = dataSource.getConnection()) {
-            int nonEmptyTables = connection.createStatement().executeQuery(
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(
                     String.format("SELECT COUNT(*) FROM information_schema.tables WHERE TABLE_NAME = '%s'", tableName)
-            ).getInt(1);
-            if (nonEmptyTables == 0) {
-                return Health.down().withDetail("reason", "Table '" + tableName + "' is empty").build();
+            );
+
+            if (resultSet.next()) {
+                int nonEmptyTables = resultSet.getInt(1);
+
+                if (nonEmptyTables == 0) {
+                    return Health.down().withDetail("reason", "Table '" + tableName + "' is empty").build();
+                }
+                return Health.up().build();
+            } else {
+                return Health.down().withDetail("reason", "No rows found for table '" + tableName + "'").build();
             }
-            return Health.up().build();
         }
     }
+
 }

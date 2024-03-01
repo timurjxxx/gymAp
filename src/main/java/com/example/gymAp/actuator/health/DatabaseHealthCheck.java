@@ -19,7 +19,7 @@ public class DatabaseHealthCheck  extends BaseHealthCheck  {
     }
 
     @Override
-    protected Health checkHealth() throws SQLException {
+    public Health checkHealth() throws SQLException {
         try (Connection connection = dataSource.getConnection()) {
             if (!connection.isValid(0)) {
                 return Health.down().withDetail("reason", "Database connection not valid").build();
