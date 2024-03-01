@@ -1,4 +1,4 @@
-package com.example.gymAp.actuatorTest;
+package com.example.gymAp.actuatorTest.health;
 
 import com.example.gymAp.actuator.health.BaseHealthCheck;
 import org.junit.jupiter.api.Test;

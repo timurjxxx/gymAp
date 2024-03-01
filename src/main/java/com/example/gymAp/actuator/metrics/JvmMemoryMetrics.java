@@ -17,4 +17,8 @@ public class JvmMemoryMetrics {
                 .baseUnit("bytes")
                 .register(registry);
     }
+
+    public Gauge getMemoryUsage() {
+        return memoryUsage;
+    }
 }

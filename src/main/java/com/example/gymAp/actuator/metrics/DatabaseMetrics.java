@@ -18,7 +18,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 public class DatabaseMetrics {
 
     @Autowired
-    private DataSource dataSource;
+    public DataSource dataSource;
 
     private final Counter failedQueries;
     private final Timer connectionTimer;
