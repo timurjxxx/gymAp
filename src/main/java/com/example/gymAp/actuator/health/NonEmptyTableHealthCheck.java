@@ -27,7 +27,7 @@ public class NonEmptyTableHealthCheck extends BaseHealthCheck {
         try (Connection connection = dataSource.getConnection()) {
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(
-                    String.format("SELECT COUNT(*) FROM information_schema.tables WHERE TABLE_NAME = '%s'", tableName)
+                    String.format("SELECT COUNT(*) FROM " + tableName )
             );
 
             if (resultSet.next()) {
@@ -35,12 +35,14 @@ public class NonEmptyTableHealthCheck extends BaseHealthCheck {
 
                 if (nonEmptyTables == 0) {
                     return Health.down().withDetail("reason", "Table '" + tableName + "' is empty").build();
+                } else {
+                    return Health.up().build();
                 }
-                return Health.up().build();
             } else {
                 return Health.down().withDetail("reason", "No rows found for table '" + tableName + "'").build();
             }
         }
     }
+
 
 }
