@@ -24,7 +24,7 @@ public class TrainerController {
         this.trainerService = trainerService;
     }
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/create_trainer",consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> createTrainer(@RequestBody Trainer trainer) {
 
         Trainer createdTrainee = trainerService.createTrainer(trainer, trainer.getUser(), trainer.getSpecialization().getTrainingTypeName());

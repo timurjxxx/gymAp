@@ -29,7 +29,7 @@ public class TraineeController {
         this.trainerService = trainerService;
     }
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/create_trainee",consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> createTrainee(@RequestBody Trainee trainee) {
 
         Trainee createdTrainee = traineeService.createTrainee(trainee, trainee.getUser());
