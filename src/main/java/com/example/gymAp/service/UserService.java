@@ -1,12 +1,12 @@
 package com.example.gymAp.service;
 
-import com.example.gymAp.aspect.Authenticated;
 import com.example.gymAp.dao.UserDAO;
 import com.example.gymAp.exception.UserNotFoundException;
 import com.example.gymAp.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,10 +17,15 @@ import java.util.Random;
 import java.util.stream.IntStream;
 
 @Service
+
 public class UserService {
 
     private final UserDAO userDAO;
+    @Value("${app.user.password.chars}")
+    private String passwordChars;
 
+    @Value("${app.user.password.length}")
+    private int passwordLength;
     private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
 
     @Autowired
@@ -100,21 +105,17 @@ public class UserService {
     }
 
     public String generatePassword() {
-        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        StringBuilder sb = new StringBuilder(10);
         Random random = new Random();
-        for (int i = 0; i < 10; i++) {
-            int index = random.nextInt(chars.length());
-            sb.append(chars.charAt(index));
-        }
+        String password = IntStream.range(0, passwordLength)
+                .mapToObj(i -> passwordChars.charAt(random.nextInt(passwordChars.length())))
+                .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append)
+                .toString();
+
         LOGGER.info("Generating unique password");
-        LOGGER.debug("Generated password: {}", sb.toString());
+        LOGGER.debug("Generated password: {}", password);
 
-        return sb.toString();
+        return password;
     }
 
-    @Authenticated
-    public void authenticated(String username, String password) {
 
-    }
 }

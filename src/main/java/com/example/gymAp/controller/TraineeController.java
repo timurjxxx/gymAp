@@ -1,6 +1,5 @@
 package com.example.gymAp.controller;
 
-import com.example.gymAp.aspect.Authenticated;
 import com.example.gymAp.model.Trainee;
 import com.example.gymAp.model.Trainer;
 import com.example.gymAp.service.TraineeService;
@@ -37,9 +36,8 @@ public class TraineeController {
 
     }
 
-    @Authenticated
-    @GetMapping("/get_Trainee")
-    public ResponseEntity<String> getTraineeProfile(@RequestHeader("username") String username, @RequestHeader("password") String password) {
+    @GetMapping("/get_Trainee/{username}")
+    public ResponseEntity<String> getTraineeProfile(@PathVariable("username") String username) {
 
         Trainee trainee = traineeService.selectTraineeByUserName(username);
         if (trainee != null) {
@@ -51,23 +49,20 @@ public class TraineeController {
 
     }
 
-    @Authenticated
-    @PutMapping(value = "/update_Trainee", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> updateTraineeProfile(@RequestHeader("username") String username, @RequestHeader("password") String password, @RequestBody Trainee trainee) {
+    @PutMapping(value = "/update_Trainee/{username}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> updateTraineeProfile(@PathVariable("username") String username, @RequestBody Trainee trainee) {
         Trainee updatedTrainee = traineeService.updateTrainee(trainee.getUser().getUserName(), trainee);
         return ResponseEntity.ok(updatedTrainee.toString() + updatedTrainee.getTrainers().toString());
     }
 
-    @Authenticated
-    @DeleteMapping("/delete_Trainee")
-    public ResponseEntity<Void> deleteTraineeProfile(@RequestHeader("username") String username, @RequestHeader("password") String password) {
+    @DeleteMapping("/delete_Trainee/{username}")
+    public ResponseEntity<Void> deleteTraineeProfile(@PathVariable("username") String username) {
         traineeService.deleteTraineeByUserName(username);
         return ResponseEntity.ok().build();
     }
 
-    @Authenticated
-    @PutMapping(value = "/updateTrainersList", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> updateTraineeTrainersList(@RequestHeader("username") String username, @RequestHeader("password") String password, @RequestBody Map<String, Object> jsonData) {
+    @PutMapping(value = "/updateTrainersList/{username}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> updateTraineeTrainersList(@PathVariable("username") String username, @RequestBody Map<String, Object> jsonData) {
         String traineeUsername = (String) jsonData.get("traineeUsername");
         List<String> trainerUsernames = (List<String>) jsonData.get("trainerUsernames");
         Set<Trainer> trainers = new HashSet<>();
@@ -78,9 +73,8 @@ public class TraineeController {
         return ResponseEntity.ok(updatedTrainee.getTrainers().toString());
     }
 
-    @Authenticated
-    @PatchMapping(value = "/change_status", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> activateDeactivateTrainee(@RequestHeader("username") String username, @RequestHeader("password") String password, @RequestBody Map<String, String> jsonData) {
+    @PatchMapping(value = "/change_status/{username}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> activateDeactivateTrainee(@PathVariable("username") String username, @RequestBody Map<String, String> jsonData) {
         traineeService.changeStatus(jsonData.get("username"));
         return ResponseEntity.ok().build();
     }

@@ -1,6 +1,5 @@
 package com.example.gymAp.controller;
 
-import com.example.gymAp.aspect.Authenticated;
 import com.example.gymAp.model.Trainer;
 import com.example.gymAp.service.TrainerService;
 import jakarta.persistence.EntityNotFoundException;
@@ -32,9 +31,8 @@ public class TrainerController {
 
     }
 
-    @Authenticated
-    @GetMapping("/get_Trainer")
-    public ResponseEntity<String> getTrainerProfile(@RequestHeader("username") String username,@RequestHeader("password") String password) {
+    @GetMapping("/get_Trainer/{username}")
+    public ResponseEntity<String> getTrainerProfile(@PathVariable("username") String username) {
 
         Trainer trainer = trainerService.selectTrainerByUserName(username);
         if (trainer != null) {
@@ -46,17 +44,15 @@ public class TrainerController {
 
     }
 
-    @Authenticated
-    @PutMapping(value = "/update_Trainer", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> updateTrainerProfile(@RequestHeader("username") String username, @RequestHeader("password") String password, @RequestBody Trainer trainer) {
+    @PutMapping(value = "/update_Trainer/{username}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> updateTrainerProfile(@PathVariable("username") String username, @RequestBody Trainer trainer) {
         Trainer updatedTrainee = trainerService.updateTrainer(trainer.getUser().getUserName(), trainer);
         return ResponseEntity.ok(updatedTrainee.toString());
     }
-    @Authenticated
-    @GetMapping("/get_Trainers")
-    public ResponseEntity<String> getNotAssignedActiveTrainers(@RequestHeader("username") String userName,@RequestHeader("password") String password) {
+    @GetMapping("/get_Trainers/{username}")
+    public ResponseEntity<String> getNotAssignedActiveTrainers(@PathVariable("username") String username) {
 
-        List<Trainer> trainer = trainerService.getNotAssignedActiveTrainers(userName);
+        List<Trainer> trainer = trainerService.getNotAssignedActiveTrainers(username);
         if (trainer != null) {
             return ResponseEntity.ok(trainer.toString());
 
@@ -66,9 +62,8 @@ public class TrainerController {
 
     }
 
-    @Authenticated
-    @PatchMapping(value = "/change_status", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> activateDeactivateTrainer(@RequestHeader("username") String username,@RequestHeader("password") String password, @RequestBody Map<String, String> jsonData) {
+    @PatchMapping(value = "/change_status/{username}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> activateDeactivateTrainer(@PathVariable("username") String username, @RequestBody Map<String, String> jsonData) {
         trainerService.changeStatus(jsonData.get("username"));
         return ResponseEntity.ok().build();
     }

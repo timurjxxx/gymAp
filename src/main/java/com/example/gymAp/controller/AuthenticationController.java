@@ -25,7 +25,6 @@ public class AuthenticationController {
     public ResponseEntity<?> login(@RequestBody Map<String, String> cred) {
         String username = cred.get("username");
         String password = cred.get("password");
-        userService.authenticated(username, password);
         return ResponseEntity.ok().build();
 
     }
@@ -34,7 +33,6 @@ public class AuthenticationController {
     public ResponseEntity<?> changeLogin(@RequestBody Map<String, String> cred) {
         String username = cred.get("username");
         String password = cred.get("password");
-        userService.authenticated(username, password);
         userService.changePassword(username, cred.get("newPassword"));
         return ResponseEntity.ok().build();
     }
