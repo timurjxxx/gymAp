@@ -7,12 +7,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.Random;
 import java.util.stream.IntStream;
 
@@ -23,14 +26,16 @@ public class UserService {
     private final UserDAO userDAO;
     @Value("${app.user.password.chars}")
     private String passwordChars;
-
     @Value("${app.user.password.length}")
     private int passwordLength;
+
+    private final PasswordEncoder passwordEncoder;
     private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
 
     @Autowired
-    public UserService(UserDAO userDAO) {
+    public UserService(UserDAO userDAO, PasswordEncoder passwordEncoder) {
         this.userDAO = userDAO;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public User selectUser(@NotBlank Long userId) {
@@ -46,7 +51,9 @@ public class UserService {
 
     @Transactional
     public User createUser(@Valid User newUser) {
-        newUser.setPassword(generatePassword());
+        String salt = generateSecurePassword();
+        String hashedPassword = passwordEncoder.encode(generatePassword() + salt);
+        newUser.setPassword(hashedPassword);
         newUser.setUserName(generateUsername(newUser.getFirstName() + "." + newUser.getLastName()));
         User savedUser = userDAO.save(newUser);
 
@@ -117,5 +124,11 @@ public class UserService {
         return password;
     }
 
+    public static String generateSecurePassword() {
+        byte[] randomBytes = new byte[32];
+        SecureRandom random = new SecureRandom();
+        random.nextBytes(randomBytes);
+        return Base64.getEncoder().encodeToString(randomBytes);
+    }
 
 }

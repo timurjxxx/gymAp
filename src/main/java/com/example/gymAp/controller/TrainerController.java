@@ -23,13 +23,6 @@ public class TrainerController {
         this.trainerService = trainerService;
     }
 
-    @PostMapping(value = "/create_trainer",consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> createTrainer(@RequestBody Trainer trainer) {
-
-        Trainer createdTrainee = trainerService.createTrainer(trainer, trainer.getUser(), trainer.getSpecialization().getTrainingTypeName());
-        return ResponseEntity.ok("Username :" + createdTrainee.getUser().getUserName() + " Password :" + createdTrainee.getUser().getPassword());
-
-    }
 
     @GetMapping("/get_Trainer/{username}")
     public ResponseEntity<String> getTrainerProfile(@PathVariable("username") String username) {

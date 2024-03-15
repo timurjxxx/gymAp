@@ -24,16 +24,19 @@ public class WebSecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
                         auth -> auth
-                                .requestMatchers("/trainee/create_trainee", "/trainer/create_trainer").permitAll()
+                                .requestMatchers("/auth/create_trainee", "/auth/create_trainer").permitAll()
                                 .anyRequest().authenticated()
                 )
 //                .addFilterBefore()
                 .formLogin(login -> login
-                        .loginPage("/login/sign_in")
+                        .loginPage("/login/login")
                         .usernameParameter("username")
                         .usernameParameter("password")
+                        .permitAll()
                 )
-                .logout(Customizer.withDefaults());
+                .logout(logout -> logout
+                        .logoutUrl("/auth/logout")
+                        .logoutSuccessUrl("/auth/login"));
 
         return http.build();
 
@@ -48,5 +51,7 @@ public class WebSecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
+
+
 
 }
