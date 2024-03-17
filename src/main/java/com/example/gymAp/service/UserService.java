@@ -1,12 +1,19 @@
 package com.example.gymAp.service;
 
+import com.example.gymAp.dao.RolesDAO;
 import com.example.gymAp.dao.UserDAO;
 import com.example.gymAp.exception.UserNotFoundException;
 import com.example.gymAp.model.User;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,49 +23,40 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.security.SecureRandom;
 import java.util.Base64;
+import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Service
-
-public class UserService {
+@RequiredArgsConstructor
+@Slf4j
+public class UserService implements UserDetailsService {
 
     private final UserDAO userDAO;
+    private final RolesDAO rolesDAO;
     @Value("${app.user.password.chars}")
     private String passwordChars;
     @Value("${app.user.password.length}")
     private int passwordLength;
 
-    private final PasswordEncoder passwordEncoder;
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
-
-    @Autowired
-    public UserService(UserDAO userDAO, PasswordEncoder passwordEncoder) {
-        this.userDAO = userDAO;
-        this.passwordEncoder = passwordEncoder;
-    }
-
-    public User selectUser(@NotBlank Long userId) {
-        return userDAO.findById(userId).orElseThrow(() -> new UserNotFoundException("User is not found"));
-    }
 
     @Transactional(readOnly = true)
     public User findUserByUserName(String username) {
-        LOGGER.info("Finding user by username: {}", username);
+        log.info("Finding user by username: {}", username);
 
         return userDAO.findUserByUserName(username).orElseThrow(() -> new UserNotFoundException("User with username " + username + "is not found "));
     }
 
     @Transactional
     public User createUser(@Valid User newUser) {
-        String salt = generateSecurePassword();
-        String hashedPassword = passwordEncoder.encode(generatePassword() + salt);
-        newUser.setPassword(hashedPassword);
+        newUser.setRoles(List.of(rolesDAO.findByName("ROLE_USER").get()));
+        newUser.setPassword(generatePassword());
         newUser.setUserName(generateUsername(newUser.getFirstName() + "." + newUser.getLastName()));
         User savedUser = userDAO.save(newUser);
 
-        LOGGER.info("Created user with ID: {}", savedUser.getId());
-        LOGGER.debug("Created user details: {}", savedUser);
+        log.info("Created user with ID: {}", savedUser.getId());
+        log.debug("Created user details: {}", savedUser);
 
         return userDAO.save(newUser);
     }
@@ -76,13 +74,13 @@ public class UserService {
     public void delete(Long id) {
         userDAO.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User with id " + id + "is not found "));
-        LOGGER.info("Deleting user with ID: {}", id);
+        log.info("Deleting user with ID: {}", id);
         userDAO.deleteById(id);
     }
 
     @Transactional
     public String changePassword(@NotBlank String username, @NotBlank String newPassword) {
-        LOGGER.info("Changing password for user: {}", username);
+        log.info("Changing password for user: {}", username);
 
         User user = userDAO.findUserByUserName(username).orElseThrow(() -> new UserNotFoundException("User with username " + username + "is not found "));
         user.setPassword(newPassword);
@@ -92,7 +90,7 @@ public class UserService {
 
     @Transactional
     public boolean changeStatus(@NotBlank String username) {
-        LOGGER.info("Deactivating user: {}", username);
+        log.info("Deactivating user: {}", username);
 
         User user = userDAO.findUserByUserName(username).orElseThrow(() -> new UserNotFoundException("User with username " + username + "is not found "));
         user.setIsActive(!user.getIsActive());
@@ -101,8 +99,8 @@ public class UserService {
     }
 
     public String generateUsername(String username1) {
-        LOGGER.info("Generating username");
-        LOGGER.debug("Base username: {}", username1);
+        log.info("Generating username");
+        log.debug("Base username: {}", username1);
 
         return IntStream.iterate(1, i -> i + 1)
                 .mapToObj(serialNumber -> username1 + ((serialNumber == 1) ? "" : "." + serialNumber))
@@ -118,17 +116,20 @@ public class UserService {
                 .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append)
                 .toString();
 
-        LOGGER.info("Generating unique password");
-        LOGGER.debug("Generated password: {}", password);
+        log.info("Generating unique password");
+        log.debug("Generated password: {}", password);
 
         return password;
     }
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = findUserByUserName(username);
 
-    public static String generateSecurePassword() {
-        byte[] randomBytes = new byte[32];
-        SecureRandom random = new SecureRandom();
-        random.nextBytes(randomBytes);
-        return Base64.getEncoder().encodeToString(randomBytes);
+        return new org.springframework.security.core.userdetails.User(
+                user.getUserName(),
+                user.getPassword(),
+                user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList())
+
+        );
     }
-
 }

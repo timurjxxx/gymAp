@@ -4,8 +4,12 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 import javax.validation.constraints.NotBlank;
+import java.util.Collection;
 import java.util.Objects;
 
 @Getter
@@ -13,7 +17,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @Entity
 @Table(name = "user_entity")
-public class User {
+public class User  {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,6 +43,14 @@ public class User {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Trainee trainee;
 
+    @ManyToMany
+    @JoinTable(
+            name = "users_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Collection<Roles> roles;
+
     @Override
     public String toString() {
         return  "firstName='" + firstName + '\'' +
@@ -58,4 +70,6 @@ public class User {
     public int hashCode() {
         return Objects.hash(id);
     }
+
+
 }

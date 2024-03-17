@@ -1,5 +1,6 @@
 package com.example.gymAp.controller;
 
+import com.example.gymAp.exception.InvalidCredentialsException;
 import com.example.gymAp.model.*;
 import com.example.gymAp.service.TraineeService;
 import com.example.gymAp.service.TrainerService;
@@ -8,10 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/auth", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -21,6 +19,7 @@ public class AuthenticationController {
     private final UserService userService;
     private final TrainerService trainerService;
     private final TraineeService traineeService;
+
 
     @Autowired
     public AuthenticationController(UserService userService, TrainerService trainerService, TraineeService traineeService) {
@@ -33,12 +32,12 @@ public class AuthenticationController {
     @GetMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         User user = userService.findUserByUserName(request.getUsername());
-        if (user.getPassword().equals(request.getPassword())) {
-            return ResponseEntity.ok().build();
+        if (!user.getPassword().equals(request.getPassword())) {
 
-        } else {
-            return ResponseEntity.ok(HttpStatus.UNAUTHORIZED);
+            throw new InvalidCredentialsException("Invalid password");
         }
+
+        return ResponseEntity.ok(HttpStatus.OK);
 
     }
 

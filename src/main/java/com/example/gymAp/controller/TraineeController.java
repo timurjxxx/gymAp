@@ -31,7 +31,7 @@ public class TraineeController {
 
 
     @GetMapping("/get_Trainee/{username}")
-    public ResponseEntity<String> getTraineeProfile(@PathVariable("username") String username) {
+    public ResponseEntity<String> getTraineeProfile(@PathVariable("username") String username   ) {
 
         Trainee trainee = traineeService.selectTraineeByUserName(username);
         if (trainee != null) {

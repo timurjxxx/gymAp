@@ -29,7 +29,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     // https://mvnrepository.com/artifact/org.springframework.security/spring-security-crypto
-    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.2.2'
+//    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.2.2'
 
 
     compileOnly 'org.projectlombok:lombok'
