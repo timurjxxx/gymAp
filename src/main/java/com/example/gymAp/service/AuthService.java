@@ -21,7 +21,6 @@ public class AuthService {
     private final TrainerService trainerService;
     private final TraineeService traineeService;
     private final JWTProvider provider;
-//    private final AuthenticationManager authenticationManager;
     private final LoginAttemptService loginAttemptService;
 
 
@@ -77,6 +76,19 @@ public class AuthService {
 
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+//    private final AuthenticationManager authenticationManager;
+
 //        try {
 //            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
 //

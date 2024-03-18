@@ -1,6 +1,7 @@
 package com.example.gymAp.aspect;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
@@ -14,9 +15,9 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Aspect
 @Component
+@Slf4j
 public class RestCallLoggingAspect {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RestCallLoggingAspect.class);
 
     @Pointcut("execution(* com.example.gymAp.controller.*.*(..))")
     public void restControllerMethods() {
@@ -28,14 +29,14 @@ public class RestCallLoggingAspect {
         String methodName = joinPoint.getSignature().getName();
         String className = joinPoint.getTarget().getClass().getSimpleName();
 
-        LOGGER.info("REST Call: {} [{}]", request.getRequestURI(), request.getMethod());
-        LOGGER.info("Class: {}, Method: {}", className, methodName);
-        LOGGER.info("Request Parameters: {}", extractRequestParameters(request));
+        log.info("REST Call: {} [{}]", request.getRequestURI(), request.getMethod());
+        log.info("Class: {}, Method: {}", className, methodName);
+        log.info("Request Parameters: {}", extractRequestParameters(request));
     }
 
     @AfterReturning(pointcut = "restControllerMethods()", returning = "result")
     public void logRestCallResult(Object result) {
-        LOGGER.info("REST Call Result: {}", extractResponseDetails(result));
+        log.info("REST Call Result: {}", extractResponseDetails(result));
     }
 
     public String extractRequestParameters(HttpServletRequest request) {

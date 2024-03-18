@@ -3,6 +3,7 @@ package com.example.gymAp.service;
 import com.example.gymAp.dao.TrainingDAO;
 import com.example.gymAp.model.*;
 import jakarta.persistence.criteria.*;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import java.util.Optional;
 import jakarta.persistence.criteria.Predicate;
 
 @Service
+@Slf4j
 public class TrainingService {
 
 
@@ -24,7 +26,6 @@ public class TrainingService {
 
     private final TrainingTypeService trainingTypeService;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TrainingService.class);
 
     @Autowired
     public TrainingService(TrainingDAO trainingDAO, TrainerService trainerService, TraineeService traineeService, TrainingTypeService trainingTypeService) {
@@ -39,17 +40,17 @@ public class TrainingService {
         training.setTrainer(trainerService.selectTrainerByUserName(trainerName));
         training.setTrainee(traineeService.selectTraineeByUserName(traineeName));
         training.setTrainingTypes(trainingTypeService.findByTrainingName(trainingTypeName));
-        LOGGER.info("Added training with trainer name {}, and trainee name {} and trainingtype {}", trainerName, traineeName, trainingTypeName);
-        LOGGER.debug("Added training details: {}", training);
+        log.info("Added training with trainer name {}, and trainee name {} and trainingtype {}", trainerName, traineeName, trainingTypeName);
+        log.debug("Added training details: {}", training);
 
         return trainingDAO.save(training);
     }
 
     public List<Training> getTrainerTrainingsByCriteria(String trainerUsername, TrainingSearchCriteria criteria) {
         Trainer trainer = trainerService.selectTrainerByUserName(trainerUsername);
-        LOGGER.info("Get trainer with username: {}", trainerUsername);
-        LOGGER.debug("Trainer details: {}", trainer);
-        LOGGER.debug("Criteria details: {}", criteria);
+        log.info("Get trainer with username: {}", trainerUsername);
+        log.debug("Trainer details: {}", trainer);
+        log.debug("Criteria details: {}", criteria);
 
         return trainingDAO.findAll((root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -76,9 +77,9 @@ public class TrainingService {
     public List<Training> getTraineeTrainingsByCriteria(String traineeUsername, TrainingSearchCriteria criteria) {
         Trainee trainee = traineeService.selectTraineeByUserName(traineeUsername);
 
-        LOGGER.info("Get trainee with username: {}", traineeUsername);
-        LOGGER.debug("Trainee details: {}", trainee);
-        LOGGER.debug("Criterie details: {}", criteria);
+        log.info("Get trainee with username: {}", traineeUsername);
+        log.debug("Trainee details: {}", trainee);
+        log.debug("Criterie details: {}", criteria);
 
         return trainingDAO.findAll((root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();

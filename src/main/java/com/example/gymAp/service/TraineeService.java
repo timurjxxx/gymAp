@@ -7,6 +7,7 @@ import com.example.gymAp.exception.UserNotFoundException;
 import com.example.gymAp.model.Trainee;
 import com.example.gymAp.model.Trainer;
 import com.example.gymAp.model.User;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,22 +21,18 @@ import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 @Service
+@Slf4j
 public class TraineeService {
 
     private final UserService userService;
-    private final UserDAO userDAO;
 
     private final TraineeDAO traineeDAO;
-    private final TrainerDAO trainerDAO;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TraineeService.class);
 
     @Autowired
-    public TraineeService(TraineeDAO traineeDAO, UserService userService, UserDAO userDAO, TrainerDAO trainerDAO) {
+    public TraineeService(TraineeDAO traineeDAO, UserService userService) {
         this.traineeDAO = traineeDAO;
         this.userService = userService;
-        this.userDAO = userDAO;
-        this.trainerDAO = trainerDAO;
     }
 
     @Transactional
@@ -64,16 +61,16 @@ public class TraineeService {
                 .orElseThrow(() -> new UserNotFoundException("Trainee with username: " + username + " is not found"));
 
         traineeDAO.deleteTraineeByUserUserName(username);
-        LOGGER.info("Deleted trainee with username: {}", username);
-        LOGGER.debug("Deleted trainee with username {}  ", username);
+        log.info("Deleted trainee with username: {}", username);
+        log.debug("Deleted trainee with username {}  ", username);
     }
 
     @Transactional
     public Trainee updateTraineeTrainersList(@NotBlank String username, @NotBlank Set<Trainer> updatedList) throws UserNotFoundException {
         Trainee trainee = traineeDAO.findTraineeByUserUserName(username).orElseThrow(() -> new UserNotFoundException("Trainee with username: " + username + " is not found"));
         trainee.setTrainers(updatedList);
-        LOGGER.info("Updated trainers list for trainee with username {}", username);
-        LOGGER.debug("Updated trainee details: new trainers list {}", updatedList);
+        log.info("Updated trainers list for trainee with username {}", username);
+        log.debug("Updated trainee details: new trainers list {}", updatedList);
 
         return traineeDAO.save(trainee);
     }
@@ -82,13 +79,13 @@ public class TraineeService {
     public void changePassword(@NotBlank String username, @NotBlank String newPassword) throws UserNotFoundException {
         Trainee trainee = traineeDAO.findTraineeByUserUserName(username).orElseThrow(() -> new UserNotFoundException("Trainee with username: " + username + " is not found"));
         trainee.getUser().setPassword(userService.changePassword(username, newPassword));
-        LOGGER.info("Changed password for trainee with username: {}", username);
+        log.info("Changed password for trainee with username: {}", username);
     }
 
     @Transactional
     public void changeStatus(@NotBlank String username) throws UserNotFoundException {
         Trainee trainee = traineeDAO.findTraineeByUserUserName(username).orElseThrow(() -> new UserNotFoundException("Trainee with username: " + username + " is not found"));
         trainee.getUser().setIsActive(userService.changeStatus(username));
-        LOGGER.info("Changed status for trainee with ID: {}", trainee.getId());
+        log.info("Changed status for trainee with ID: {}", trainee.getId());
     }
 }
