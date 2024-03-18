@@ -1,74 +1,46 @@
 package com.example.gymAp.controller;
 
-import com.example.gymAp.exception.InvalidCredentialsException;
+import com.example.gymAp.dto.ChangeLoginRequest;
+import com.example.gymAp.dto.LoginRequest;
 import com.example.gymAp.model.*;
-import com.example.gymAp.service.TraineeService;
-import com.example.gymAp.service.TrainerService;
-import com.example.gymAp.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import com.example.gymAp.service.AuthService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "/auth", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequiredArgsConstructor
 public class AuthenticationController {
 
 
-    private final UserService userService;
-    private final TrainerService trainerService;
-    private final TraineeService traineeService;
-
-
-    @Autowired
-    public AuthenticationController(UserService userService, TrainerService trainerService, TraineeService traineeService) {
-        this.userService = userService;
-        this.trainerService = trainerService;
-        this.traineeService = traineeService;
-    }
+    private final AuthService service;
 
 
     @GetMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        User user = userService.findUserByUserName(request.getUsername());
-        if (!user.getPassword().equals(request.getPassword())) {
-
-            throw new InvalidCredentialsException("Invalid password");
-        }
-
-        return ResponseEntity.ok(HttpStatus.OK);
-
+        return ResponseEntity.ok(service.login(request));
     }
 
     @PostMapping(value = "/create_trainee", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> createTrainee(@RequestBody Trainee trainee) {
-
-        Trainee createdTrainee = traineeService.createTrainee(trainee, trainee.getUser());
-        return ResponseEntity.ok("Username :" + createdTrainee.getUser().getUserName() + " Password :" + createdTrainee.getUser().getPassword());
+        return ResponseEntity.ok(service.createTrainee(trainee));
 
     }
 
     @PostMapping(value = "/create_trainer", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> createTrainer(@RequestBody Trainer trainer) {
-
-        Trainer createdTrainee = trainerService.createTrainer(trainer, trainer.getUser(), trainer.getSpecialization().getTrainingTypeName());
-        return ResponseEntity.ok("Username :" + createdTrainee.getUser().getUserName() + " Password :" + createdTrainee.getUser().getPassword());
+        return ResponseEntity.ok(service.createTrainer(trainer));
 
     }
 
 
     @PutMapping(value = "/changePassword", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> changeLogin(@RequestBody ChangeLoginRequest request) {
-        User user = userService.findUserByUserName(request.getUsername());
-        if (user.getPassword().equals(request.getOldPassword())) {
-            userService.changePassword(request.getUsername(), request.getNewPassword());
-            return ResponseEntity.ok().build();
 
-        } else {
-            return ResponseEntity.ok(HttpStatus.BAD_GATEWAY);
-        }
 
+        return ResponseEntity.ok(service.changeLogin(request));
     }
 }
 

@@ -1,11 +1,14 @@
 package com.example.gymAp.config;
 
+import com.example.gymAp.security.JWTFilter;
 import com.example.gymAp.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Session;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -16,14 +19,24 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final UserService userService;
+    private  UserService userService;
+    private  JWTFilter filter;
 
+    @Autowired
+    public void userService(UserService userService) {
+        this.userService = userService;
+    }
+
+    @Autowired
+    public void setFilter(JWTFilter filter) {
+        this.filter = filter;
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -34,10 +47,8 @@ public class SecurityConfig {
                                 .requestMatchers("/auth/create_trainee", "/auth/create_trainer", "/auth/login").permitAll()
                         .anyRequest().authenticated()
                 ).sessionManagement(sessin -> sessin.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .formLogin(login -> login
-                        .loginPage("/auth/login"))
-                .exceptionHandling(Customizer.withDefaults());
-        //add filter before
+                .exceptionHandling(Customizer.withDefaults())
+                .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
 

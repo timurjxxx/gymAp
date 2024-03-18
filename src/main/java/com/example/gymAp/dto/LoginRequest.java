@@ -1,4 +1,4 @@
-package com.example.gymAp.model;
+package com.example.gymAp.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,9 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChangeLoginRequest {
+public class LoginRequest {
 
     private String username;
-    private String oldPassword;
-    private String newPassword;
+    private String password;
 }

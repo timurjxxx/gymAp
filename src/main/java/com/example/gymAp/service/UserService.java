@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -33,8 +34,28 @@ import java.util.stream.IntStream;
 @Slf4j
 public class UserService implements UserDetailsService {
 
-    private final UserDAO userDAO;
-    private final RolesDAO rolesDAO;
+    private UserDAO userDAO;
+    private RoleService roleService;
+
+    private PasswordEncoder encoder;
+
+    @Autowired
+    public void setUserDAO(UserDAO userDAO) {
+        this.userDAO = userDAO;
+    }
+
+    @Autowired
+
+    public void setRoleService(RoleService roleService) {
+        this.roleService = roleService;
+    }
+
+    @Autowired
+
+    public void setEncoder(PasswordEncoder encoder) {
+        this.encoder = encoder;
+    }
+
     @Value("${app.user.password.chars}")
     private String passwordChars;
     @Value("${app.user.password.length}")
@@ -50,13 +71,10 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public User createUser(@Valid User newUser) {
-        newUser.setRoles(List.of(rolesDAO.findByName("ROLE_USER").get()));
-        newUser.setPassword(generatePassword());
+        newUser.setRoles(List.of(roleService.getUserRole()));
+        newUser.setPassword(encoder.encode(generatePassword()));
         newUser.setUserName(generateUsername(newUser.getFirstName() + "." + newUser.getLastName()));
-        User savedUser = userDAO.save(newUser);
 
-        log.info("Created user with ID: {}", savedUser.getId());
-        log.debug("Created user details: {}", savedUser);
 
         return userDAO.save(newUser);
     }
@@ -121,6 +139,7 @@ public class UserService implements UserDetailsService {
 
         return password;
     }
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = findUserByUserName(username);
