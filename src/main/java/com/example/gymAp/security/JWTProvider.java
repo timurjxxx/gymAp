@@ -1,22 +1,16 @@
 package com.example.gymAp.security;
 
-import com.example.gymAp.dao.UserDAO;
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import java.security.Key;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Component
+@Slf4j
 public class JWTProvider {
 
     @Value("${app.jwt.access.key}")
@@ -24,6 +18,7 @@ public class JWTProvider {
 
     @Value("${app.jwt.access.expiration}")
     private long ACCESS_EXPIRATION;
+    private final Set<String> invalidatedTokens = new HashSet<>();
 
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
@@ -57,4 +52,32 @@ public class JWTProvider {
                 .parseSignedClaims(token).getBody();
     }
 
+    public boolean isTokenValid(String token) {
+        return !isTokenInvalidated(token) && !isTokenExpired(token);
+    }
+
+    public void invalidateToken(String token) {
+        invalidatedTokens.add(token);
+        log.info("Token invalidated: '{}'", token);
+
+    }
+
+    private boolean isTokenInvalidated(String token) {
+        return invalidatedTokens.contains(token);
+    }
+
+    private boolean isTokenExpired(String token) {
+        Date expiration = getAllClaimsFromToken(token).getExpiration();
+        return expiration != null && expiration.before(new Date());
+    }
+
+    public String extractTokenFromHeader(String authorizationHeader) {
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            String token = authorizationHeader.substring(7);
+            log.info("Token extracted from header: '{}'", token);
+            return token;
+        }
+        return null;
+    }
 }
+

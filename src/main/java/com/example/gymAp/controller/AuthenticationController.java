@@ -4,6 +4,8 @@ import com.example.gymAp.dto.ChangeLoginRequest;
 import com.example.gymAp.dto.LoginRequest;
 import com.example.gymAp.model.*;
 import com.example.gymAp.service.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +43,11 @@ public class AuthenticationController {
 
 
         return ResponseEntity.ok(service.changeLogin(request));
+    }
+
+    @GetMapping("/logout")
+    public ResponseEntity<String> logout(HttpServletRequest request) {
+        return ResponseEntity.ok(service.logout(request));
     }
 }
 

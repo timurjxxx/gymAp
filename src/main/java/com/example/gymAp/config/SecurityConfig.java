@@ -51,10 +51,10 @@ public class SecurityConfig {
                 .exceptionHandling(Customizer.withDefaults())
                 .formLogin(login -> login
                         .loginPage("/auth/login"))
-                .logout(logout -> logout
-                        .logoutUrl("/auth/logout").permitAll()
-                        .logoutSuccessHandler(logoutSuccessHandler())
-                        .logoutSuccessUrl("/auth/login"))
+//                .logout(logout -> logout
+//                        .logoutUrl("/auth/logout").permitAll()
+//                        .logoutSuccessHandler(logoutSuccessHandler())
+//                        .logoutSuccessUrl("/auth/login"))
                 .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

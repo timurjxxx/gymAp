@@ -5,7 +5,10 @@ import com.example.gymAp.dto.JwtResponse;
 import com.example.gymAp.dto.LoginRequest;
 import com.example.gymAp.model.*;
 import com.example.gymAp.security.JWTProvider;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthService {
 
 
@@ -27,7 +31,6 @@ public class AuthService {
     private final PasswordEncoder encoder;
 
     public JwtResponse login(LoginRequest request) {
-        String password = encoder.encode(request.getPassword());
         if (loginAttemptService.isBlocked(request.getUsername())) {
             throw new BadCredentialsException("Your account is temporarily blocked. Please try again later.");
         }
@@ -39,7 +42,7 @@ public class AuthService {
             loginAttemptService.loginFailed(request.getUsername());
             throw new BadCredentialsException("Invalid username or password");
         }
-        if (encoder.matches(request.getPassword(), userDetails.getPassword())) {
+        if (decoderPassword(request.getPassword(), userDetails.getPassword())) {
             loginAttemptService.loginSucceeded(request.getUsername());
             String token = provider.generateToken(userDetails);
             return new JwtResponse(token);
@@ -52,7 +55,7 @@ public class AuthService {
 
     public HttpStatus changeLogin(ChangeLoginRequest request) {
         User user = userService.findUserByUserName(request.getUsername());
-        if (user.getPassword().equals(request.getOldPassword())) {
+        if (decoderPassword(request.getOldPassword(), user.getPassword())) {
             userService.changePassword(request.getUsername(), request.getNewPassword());
             return HttpStatus.OK;
 
@@ -87,4 +90,23 @@ public class AuthService {
     private boolean decoderPassword(String rawPassword, String encoderPassword) {
         return encoder.matches(rawPassword, encoderPassword);
     }
+
+
+    public String logout(HttpServletRequest request) {
+        String token = provider.extractTokenFromHeader(request.getHeader("Authorization"));
+        log.info("Logout initiated. Token to invalidate: {}", token);
+        if (provider.isTokenValid(token) && token != null) {
+            provider.invalidateToken(token);
+            log.info("Token invalidated successfully.");
+        }
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+            log.info("Session invalidated successfully.");
+        }
+        log.info("Logged out successfully.");
+        return "Logged out successfully";
+    }
+
+
 }
