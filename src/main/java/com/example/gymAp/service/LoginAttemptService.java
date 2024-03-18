@@ -1,5 +1,6 @@
 package com.example.gymAp.service;
 
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -18,7 +19,6 @@ public class LoginAttemptService {
         attemptsCache.put(username, attemptsCache.getOrDefault(username, 0) + 1);
         if (attemptsCache.getOrDefault(username, 0) >= MAX_ATTEMPTS) {
             blockList.put(username, System.currentTimeMillis() + BLOCK_DURATION);
-            System.out.printf("To many request failed");
         }
     }
 

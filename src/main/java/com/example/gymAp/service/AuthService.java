@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,31 +26,28 @@ public class AuthService {
 
 
     public JwtResponse login(LoginRequest request) {
-//        try {
-//            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
-//
-//        } catch (BadCredentialsException e) {
-//            return new ResponseEntity<>(new AppError(HttpStatus.UNAUTHORIZED.value(), " username or password"), HttpStatus.UNAUTHORIZED);
-//        }
-
-
-        if (loginAttemptService.isBlocked(request.getUsername())){
+        if (loginAttemptService.isBlocked(request.getUsername())) {
             throw new BadCredentialsException("Your account is temporarily blocked. Please try again later.");
-
         }
 
-        UserDetails userDetails = userService.loadUserByUsername(request.getUsername());
+        UserDetails userDetails;
+        try {
+            userDetails = userService.loadUserByUsername(request.getUsername());
+        } catch (UsernameNotFoundException ex) {
+            loginAttemptService.loginFailed(request.getUsername());
+            throw new BadCredentialsException("Invalid username or password");
+        }
+
         if (userDetails.getPassword().equals(request.getPassword())) {
             loginAttemptService.loginSucceeded(request.getUsername());
-
             String token = provider.generateToken(userDetails);
             return new JwtResponse(token);
         } else {
             loginAttemptService.loginFailed(request.getUsername());
             throw new BadCredentialsException("Invalid username or password");
         }
-
     }
+
 
     public HttpStatus changeLogin(ChangeLoginRequest request) {
         User user = userService.findUserByUserName(request.getUsername());
@@ -79,3 +77,9 @@ public class AuthService {
 
     }
 }
+//        try {
+//            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
+//
+//        } catch (BadCredentialsException e) {
+//            return new ResponseEntity<>(new AppError(HttpStatus.UNAUTHORIZED.value(), " username or password"), HttpStatus.UNAUTHORIZED);
+//        }
