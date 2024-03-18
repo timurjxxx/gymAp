@@ -58,7 +58,7 @@ public class AuthService {
         } else {
 
 
-            return HttpStatus.BAD_GATEWAY;
+            return HttpStatus.BAD_REQUEST;
         }
 
     }
