@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,8 +24,10 @@ public class AuthService {
     private final JWTProvider provider;
     private final LoginAttemptService loginAttemptService;
 
+    private final PasswordEncoder encoder;
 
     public JwtResponse login(LoginRequest request) {
+        String password = encoder.encode(request.getPassword());
         if (loginAttemptService.isBlocked(request.getUsername())) {
             throw new BadCredentialsException("Your account is temporarily blocked. Please try again later.");
         }
@@ -36,8 +39,7 @@ public class AuthService {
             loginAttemptService.loginFailed(request.getUsername());
             throw new BadCredentialsException("Invalid username or password");
         }
-
-        if (userDetails.getPassword().equals(request.getPassword())) {
+        if (encoder.matches(request.getPassword(), userDetails.getPassword())) {
             loginAttemptService.loginSucceeded(request.getUsername());
             String token = provider.generateToken(userDetails);
             return new JwtResponse(token);
@@ -63,35 +65,26 @@ public class AuthService {
     }
 
     public String createTrainee(Trainee trainee) {
-
+        String password = userService.generatePassword();
+        trainee.getUser().setPassword(encoderPassword(password));
         Trainee createdTrainee = traineeService.createTrainee(trainee, trainee.getUser());
-        return "Username :" + createdTrainee.getUser().getUserName() + " Password :" + createdTrainee.getUser().getPassword();
+        return "Username :" + createdTrainee.getUser().getUserName() + " Password :" + password;
 
     }
 
-    public String createTrainer( Trainer trainer) {
-
+    public String createTrainer(Trainer trainer) {
+        String password = userService.generatePassword();
+        trainer.getUser().setPassword(encoderPassword(password));
         Trainer createdTrainee = trainerService.createTrainer(trainer, trainer.getUser(), trainer.getSpecialization().getTrainingTypeName());
-        return "Username :" + createdTrainee.getUser().getUserName() + " Password :" + createdTrainee.getUser().getPassword();
+        return "Username :" + createdTrainee.getUser().getUserName() + " Password :" + password;
 
+    }
+
+    private String encoderPassword(String password) {
+        return encoder.encode(password);
+    }
+
+    private boolean decoderPassword(String rawPassword, String encoderPassword) {
+        return encoder.matches(rawPassword, encoderPassword);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-//    private final AuthenticationManager authenticationManager;
-
-//        try {
-//            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
-//
-//        } catch (BadCredentialsException e) {
-//            return new ResponseEntity<>(new AppError(HttpStatus.UNAUTHORIZED.value(), " username or password"), HttpStatus.UNAUTHORIZED);
-//        }

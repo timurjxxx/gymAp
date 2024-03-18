@@ -39,7 +39,7 @@ public class JWTFilter extends OncePerRequestFilter {
             try {
                 username = jwtProvider.getUsername(jwt);
             } catch (ExpiredJwtException e) {
-                log.debug("Время вышло");
+                log.debug("Time out");
             }
         }
 

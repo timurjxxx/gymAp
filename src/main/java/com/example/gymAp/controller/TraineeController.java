@@ -68,8 +68,8 @@ public class TraineeController {
     }
 
     @PatchMapping(value = "/change_status/{username}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> activateDeactivateTrainee(@PathVariable("username") String username, @RequestBody Map<String, String> jsonData) {
-        traineeService.changeStatus(jsonData.get("username"));
+    public ResponseEntity<Void> activateDeactivateTrainee(@PathVariable("username") String username) {
+        traineeService.changeStatus(username);
         return ResponseEntity.ok().build();
     }
 

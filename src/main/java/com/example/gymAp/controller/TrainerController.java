@@ -42,6 +42,7 @@ public class TrainerController {
         Trainer updatedTrainee = trainerService.updateTrainer(trainer.getUser().getUserName(), trainer);
         return ResponseEntity.ok(updatedTrainee.toString());
     }
+
     @GetMapping("/get_Trainers/{username}")
     public ResponseEntity<String> getNotAssignedActiveTrainers(@PathVariable("username") String username) {
 
@@ -56,8 +57,8 @@ public class TrainerController {
     }
 
     @PatchMapping(value = "/change_status/{username}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> activateDeactivateTrainer(@PathVariable("username") String username, @RequestBody Map<String, String> jsonData) {
-        trainerService.changeStatus(jsonData.get("username"));
+    public ResponseEntity<Void> activateDeactivateTrainer(@PathVariable("username") String username) {
+        trainerService.changeStatus(username);
         return ResponseEntity.ok().build();
     }
 

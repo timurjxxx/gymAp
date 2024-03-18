@@ -28,8 +28,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
-    // https://mvnrepository.com/artifact/org.springframework.security/spring-security-crypto
-//    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.2.2'
+    implementation group: 'org.mapstruct', name: 'mapstruct', version: '1.5.5.Final'
+
 
 
     compileOnly 'org.projectlombok:lombok'
@@ -57,12 +57,13 @@ dependencies {
     implementation group: 'io.micrometer', name: 'micrometer-core', version: '1.12.3'
 
 
-    // https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-jackson
     runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.12.5'
-// https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-impl
     runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.12.5'
 
     implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.12.5'
+
+
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
 
 }
 

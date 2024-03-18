@@ -1,16 +1,12 @@
 package com.example.gymAp.service;
 
-import com.example.gymAp.dao.RolesDAO;
 import com.example.gymAp.dao.UserDAO;
 import com.example.gymAp.exception.UserNotFoundException;
 import com.example.gymAp.model.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -22,8 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.security.SecureRandom;
-import java.util.Base64;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -36,6 +30,7 @@ public class UserService implements UserDetailsService {
 
     private UserDAO userDAO;
     private RoleService roleService;
+
 
     private PasswordEncoder encoder;
 
@@ -72,10 +67,7 @@ public class UserService implements UserDetailsService {
     @Transactional
     public User createUser(@Valid User newUser) {
         newUser.setRoles(List.of(roleService.getUserRole()));
-        newUser.setPassword(encoder.encode(generatePassword()));
         newUser.setUserName(generateUsername(newUser.getFirstName() + "." + newUser.getLastName()));
-
-
         return userDAO.save(newUser);
     }
 
@@ -85,6 +77,7 @@ public class UserService implements UserDetailsService {
         user.setFirstName(updatedUser.getFirstName());
         user.setLastName(updatedUser.getLastName());
         user.setIsActive(updatedUser.getIsActive());
+
         return userDAO.save(user);
     }
 

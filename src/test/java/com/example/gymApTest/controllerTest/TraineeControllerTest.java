@@ -109,10 +109,8 @@ class TraineeControllerTest {
     @Test
     void activateDeactivateTrainee() {
         String username = "testUser";
-        Map<String, String> jsonData = new HashMap<>();
-        jsonData.put("username", username);
 
-        ResponseEntity<Void> response = traineeController.activateDeactivateTrainee(username, jsonData);
+        ResponseEntity<Void> response = traineeController.activateDeactivateTrainee(username);
 
         assertEquals(ResponseEntity.ok().build(), response);
         verify(traineeService, times(1)).changeStatus(username);

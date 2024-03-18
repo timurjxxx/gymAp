@@ -93,9 +93,7 @@ public class TrainerControllerTest {
     public void testActivateDeactivateTrainer() {
         TrainerService trainerServiceMock = mock(TrainerService.class);
         TrainerController trainerController = new TrainerController(trainerServiceMock);
-
-        Map<String, String> jsonData = Collections.singletonMap("username", "someUsername");
-        ResponseEntity<Void> response = trainerController.activateDeactivateTrainer("username",  jsonData);
+        ResponseEntity<Void> response = trainerController.activateDeactivateTrainer("username");
         assertEquals(200, response.getStatusCodeValue());
     }
 }
