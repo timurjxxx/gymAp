@@ -3,8 +3,7 @@ package com.example.gymApTest.dtoTest;
 import com.example.gymAp.dto.LoginRequest;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class LoginRequestTest {
 
@@ -45,5 +44,33 @@ public class LoginRequestTest {
 
         // Verify toString method
         assertEquals("LoginRequest(username=" + username + ", password=" + password + ")", request.toString());
+    }
+
+    @Test
+    public void testSetters() {
+        // Arrange
+        LoginRequest loginRequest = new LoginRequest();
+
+        // Act
+        loginRequest.setUsername("test_username");
+        loginRequest.setPassword("test_password");
+
+        // Assert
+        assertEquals("test_username", loginRequest.getUsername());
+        assertEquals("test_password", loginRequest.getPassword());
+    }
+
+    @Test
+    public void testNoArgsConstructor() {
+        // Arrange
+        LoginRequest loginRequest = new LoginRequest();
+
+        // Act
+        String username = loginRequest.getUsername();
+        String password = loginRequest.getPassword();
+
+        // Assert
+        assertNull(username);
+        assertNull(password);
     }
 }

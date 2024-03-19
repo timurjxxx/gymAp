@@ -28,7 +28,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");
         String username = null;
         String jwt = null;
@@ -38,7 +38,7 @@ public class JWTFilter extends OncePerRequestFilter {
             try {
                 username = jwtProvider.getUsername(jwt);
             } catch (ExpiredJwtException e) {
-                log.debug("Time out");
+                log.debug("Token expired");
             }
         }
 
@@ -49,8 +49,9 @@ public class JWTFilter extends OncePerRequestFilter {
                     jwtProvider.getRoles(jwt).stream().map(SimpleGrantedAuthority::new).toList()
             );
             SecurityContextHolder.getContext().setAuthentication(token);
-
+            log.info("User authenticated successfully: {}", username);
         }
         filterChain.doFilter(request, response);
     }
+
 }

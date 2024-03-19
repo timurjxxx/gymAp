@@ -5,6 +5,8 @@ import com.example.gymAp.aspect.RestCallLoggingAspect;
 import com.example.gymAp.controller.TrainerController;
 import jakarta.servlet.http.HttpServletRequest;
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -19,6 +21,8 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class RestCallLoggingAspectTest {
@@ -36,6 +40,7 @@ public class RestCallLoggingAspectTest {
 
     @Mock
     private TrainerController controller; // Assuming you have a controller to test
+    private static Logger LOGGER = LoggerFactory.getLogger(RestCallLoggingAspect.class);
 
     @BeforeEach
     public void setup() {
@@ -77,20 +82,6 @@ public class RestCallLoggingAspectTest {
         assertEquals("param1=value1; param2=value2; ", result);
     }
 
-//    @Test
-//    public void testLogRestCallDetails() {
-//        // Arrange
-//        when(servletRequestAttributes.getRequest()).thenReturn(request);
-//        when(RequestContextHolder.currentRequestAttributes()).thenReturn(servletRequestAttributes);
-//        when(joinPoint.getSignature().getName()).thenReturn("methodName");
-//        when(joinPoint.getTarget().getClass().getSimpleName()).thenReturn("ClassName");
-//
-//        // Act
-//        restCallLoggingAspect.logRestCallDetails(joinPoint);
-//
-//    }
-
-
     @Test
     public void testLogRestCallResult() {
         Object result = "Sample Result";
@@ -98,4 +89,7 @@ public class RestCallLoggingAspectTest {
         restCallLoggingAspect.logRestCallResult(result);
 
     }
+
+
+
 }

@@ -2,11 +2,13 @@ package com.example.gymAp.service;
 
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @Service
+@Slf4j
 public class LoginAttemptService {
 
     private static final int MAX_ATTEMPTS = 3;
@@ -19,15 +21,21 @@ public class LoginAttemptService {
         attemptsCache.put(username, attemptsCache.getOrDefault(username, 0) + 1);
         if (attemptsCache.getOrDefault(username, 0) >= MAX_ATTEMPTS) {
             blockList.put(username, System.currentTimeMillis() + BLOCK_DURATION);
+            log.warn("User {} is blocked due to too many failed login attempts", username);
         }
     }
 
     public boolean isBlocked(String username) {
-        return blockList.containsKey(username) && blockList.get(username) > System.currentTimeMillis();
+        if (blockList.containsKey(username) && blockList.get(username) > System.currentTimeMillis()) {
+            log.info("User {} is blocked", username);
+            return true;
+        }
+        return false;
     }
 
     public void loginSucceeded(String username) {
         attemptsCache.remove(username);
         blockList.remove(username);
+        log.info("Login succeeded for user {}", username);
     }
 }

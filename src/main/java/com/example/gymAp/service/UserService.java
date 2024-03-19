@@ -5,13 +5,11 @@ import com.example.gymAp.exception.UserNotFoundException;
 import com.example.gymAp.model.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,16 +29,10 @@ public class UserService implements UserDetailsService {
     private final UserDAO userDAO;
     private final RoleService roleService;
 
-
-
-
-
-
     @Value("${app.user.password.chars}")
     private String passwordChars;
     @Value("${app.user.password.length}")
     private int passwordLength;
-
 
     @Transactional(readOnly = true)
     public User findUserByUserName(String username) {
@@ -53,6 +45,7 @@ public class UserService implements UserDetailsService {
     public User createUser(@Valid User newUser) {
         newUser.setRoles(List.of(roleService.getUserRole()));
         newUser.setUserName(generateUsername(newUser.getFirstName() + "." + newUser.getLastName()));
+        log.info("Creating new user: {}", newUser.getUserName());
         return userDAO.save(newUser);
     }
 
@@ -62,7 +55,7 @@ public class UserService implements UserDetailsService {
         user.setFirstName(updatedUser.getFirstName());
         user.setLastName(updatedUser.getLastName());
         user.setIsActive(updatedUser.getIsActive());
-
+        log.info("Updating user: {}", user.getUserName());
         return userDAO.save(user);
     }
 
@@ -121,7 +114,7 @@ public class UserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = findUserByUserName(username);
-
+        log.info("Load user from database by username{}", username);
         return new org.springframework.security.core.userdetails.User(
                 user.getUserName(),
                 user.getPassword(),

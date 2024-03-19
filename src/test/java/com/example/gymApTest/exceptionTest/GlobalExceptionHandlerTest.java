@@ -6,6 +6,7 @@ import com.example.gymAp.exception.UserNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -56,5 +57,18 @@ class GlobalExceptionHandlerTest {
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
     }
 
+    @Test
+    public void testHandleAccessDeniedException() {
+        // Arrange
+        GlobalExceptionHandler handler = new GlobalExceptionHandler();
+        AccessDeniedException exception = new AccessDeniedException("Access Denied");
+
+        // Act
+        ResponseEntity<String> response = handler.handleAccessDeniedException(exception);
+
+        // Assert
+        assertEquals("Access Denied", response.getBody());
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+    }
 
 }

@@ -109,4 +109,24 @@ public class AuthServiceTest {
         assertEquals("Username :null Password :null", result);
         verify(trainerService).createTrainer(trainer, user, trainer.getSpecialization().getTrainingTypeName());
     }
+
+
+
+  @Test
+    public void testChangePassword_Success() {
+        // Arrange
+        ChangeLoginRequest request = new ChangeLoginRequest("username", "oldPassword", "newPassword");
+        User user = new User();
+        user.setPassword("encodedOldPassword");
+        when(userService.findUserByUserName(request.getUsername())).thenReturn(user);
+        when(encoder.matches(request.getOldPassword(), user.getPassword())).thenReturn(true);
+
+        // Act
+        HttpStatus status = authService.changePassword(request);
+
+        // Assert
+        assertEquals(HttpStatus.OK, status);
+        verify(userService, times(1)).changePassword(request.getUsername(), request.getNewPassword());
+    }
+
 }

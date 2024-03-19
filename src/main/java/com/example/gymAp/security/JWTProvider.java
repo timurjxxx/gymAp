@@ -39,10 +39,12 @@ public class JWTProvider {
     }
 
     public String getUsername(String token){
+        log.info("Get userName from token:{}", token);
         return  getAllClaimsFromToken(token).getSubject();
     }
 
     public List<String > getRoles(String token){
+        log.info("Get roles from token:{}", token);
         return getAllClaimsFromToken(token).get("roles", List.class);
     }
     public Claims getAllClaimsFromToken(String token){
@@ -52,9 +54,6 @@ public class JWTProvider {
                 .parseSignedClaims(token).getBody();
     }
 
-    public boolean isTokenValid(String token) {
-        return !isTokenInvalidated(token) && !isTokenExpired(token);
-    }
 
     public void invalidateToken(String token) {
         invalidatedTokens.add(token);
@@ -62,22 +61,7 @@ public class JWTProvider {
 
     }
 
-    private boolean isTokenInvalidated(String token) {
-        return invalidatedTokens.contains(token);
-    }
 
-    private boolean isTokenExpired(String token) {
-        Date expiration = getAllClaimsFromToken(token).getExpiration();
-        return expiration != null && expiration.before(new Date());
-    }
 
-    public String extractTokenFromHeader(String authorizationHeader) {
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            String token = authorizationHeader.substring(7);
-            log.info("Token extracted from header: '{}'", token);
-            return token;
-        }
-        return null;
-    }
 }
 

@@ -5,14 +5,10 @@ import com.example.gymAp.dto.LoginRequest;
 import com.example.gymAp.model.*;
 import com.example.gymAp.security.JWTProvider;
 import com.example.gymAp.service.AuthService;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/auth", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -40,7 +36,7 @@ public class AuthenticationController {
 
     @PutMapping(value = "/changePassword", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> changeLogin(@RequestBody ChangeLoginRequest request) {
-        return ResponseEntity.ok(service.changeLogin(request));
+        return ResponseEntity.ok(service.changePassword(request));
     }
 }
 
