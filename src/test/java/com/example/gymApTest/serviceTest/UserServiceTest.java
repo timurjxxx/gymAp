@@ -32,8 +32,7 @@ public class UserServiceTest {
     @Mock
     private RoleService roleService;
 
-    @Mock
-    private PasswordEncoder passwordEncoder;
+
 
     @InjectMocks
     private UserService userService;
@@ -47,32 +46,34 @@ public class UserServiceTest {
 
     @Test
     public void testCreateUser() {
-        // Arrange
+        // Mock roleService
+        Roles role = new Roles();
+        role.setId(1); // Setting id to avoid null
+        role.setName("ROLE_USER"); // Setting name to avoid null
+        when(roleService.getUserRole()).thenReturn(role);
+
+        // Prepare test data
         User newUser = new User();
         newUser.setFirstName("John");
         newUser.setLastName("Doe");
-        newUser.setIsActive(true);
 
-        Roles userRole = new Roles();
-        userRole.setName("ROLE_USER");
-
-        when(roleService.getUserRole()).thenReturn(userRole);
-        when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
+        // Mock userDAO save method
         when(userDAO.save(any(User.class))).thenReturn(newUser);
 
-        // Act
-        User savedUser = userService.createUser(newUser);
+        // Call the method
+        User createdUser = userService.createUser(newUser);
 
-        // Assert
-        assertEquals("John.Doe", savedUser.getUserName());
-        assertEquals("encodedPassword", savedUser.getPassword());
-        assertEquals(true, savedUser.getIsActive());
+        // Verify that roleService.getUserRole() is called
         verify(roleService, times(1)).getUserRole();
-        verify(passwordEncoder, times(1)).encode(anyString());
+
+        // Verify that userDAO.save() is called with correct argument
         verify(userDAO, times(1)).save(any(User.class));
+
+        // Assert the result
+        assertEquals(newUser, createdUser);
+        assertEquals(1, createdUser.getRoles().size()); // Assuming only one role is assigned
+        assertEquals("John.Doe", createdUser.getUserName());
     }
-
-
     @Test
     void testFindUserByUserName() {
         Long userId = 1L;

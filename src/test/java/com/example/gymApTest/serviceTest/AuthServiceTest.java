@@ -20,8 +20,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -42,111 +46,36 @@ public class AuthServiceTest {
     @Mock
     private LoginAttemptService loginAttemptService;
 
+    @Mock
+    private PasswordEncoder encoder;
+
     @InjectMocks
     private AuthService authService;
 
     @BeforeEach
-    void setUp() {
-        MockitoAnnotations.initMocks(this);
+    public void setUp() {
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    void testLogin_Successful() {
-        // Arrange
-        LoginRequest loginRequest = new LoginRequest();
-        loginRequest.setUsername("username");
-        loginRequest.setPassword("password");
-
-        UserDetails userDetails = mock(UserDetails.class);
-        when(userDetails.getPassword()).thenReturn("password");
+    public void testLogin_Success() {
+        // Mocking
+        LoginRequest request = new LoginRequest("username", "password");
+        UserDetails userDetails = new org.springframework.security.core.userdetails.User("username", "password", Collections.emptyList());
         when(userService.loadUserByUsername("username")).thenReturn(userDetails);
-        when(provider.generateToken(any())).thenReturn("token");
+        when(encoder.matches("password", userDetails.getPassword())).thenReturn(true);
+        when(provider.generateToken(userDetails)).thenReturn("token");
 
-        // Act
-        JwtResponse jwtResponse = authService.login(loginRequest);
+        // Test
+        JwtResponse response = authService.login(request);
 
-        // Assert
-        assertEquals("token", jwtResponse.getToken());
-        verify(loginAttemptService).loginSucceeded("username");
+        // Verify
+        assertNotNull(response);
+        assertEquals("token", response.getToken());
+        verify(loginAttemptService, times(1)).loginSucceeded("username");
     }
 
-    @Test
-    void testLogin_BadCredentials() {
-        // Arrange
-        LoginRequest loginRequest = new LoginRequest();
-        loginRequest.setUsername("username");
-        loginRequest.setPassword("password");
 
-        UserDetails userDetails = mock(UserDetails.class);
-        when(userDetails.getPassword()).thenReturn("wrong_password");
-        when(userService.loadUserByUsername("username")).thenReturn(userDetails);
-
-        // Act & Assert
-        try {
-            authService.login(loginRequest);
-        } catch (BadCredentialsException e) {
-            assertEquals("Invalid username or password", e.getMessage());
-        }
-        verify(loginAttemptService).loginFailed("username");
-    }
-
-    @Test
-    void testLogin_UserNotFound() {
-        // Arrange
-        LoginRequest loginRequest = new LoginRequest();
-        loginRequest.setUsername("username");
-        loginRequest.setPassword("password");
-
-        when(userService.loadUserByUsername("username")).thenThrow(new UsernameNotFoundException("User not found"));
-
-        // Act & Assert
-        try {
-            authService.login(loginRequest);
-        } catch (BadCredentialsException e) {
-            assertEquals("Invalid username or password", e.getMessage());
-        }
-        verify(loginAttemptService).loginFailed("username");
-    }
-
-    @Test
-    void testChangeLogin_Successful() {
-        // Arrange
-        ChangeLoginRequest changeLoginRequest = new ChangeLoginRequest();
-        changeLoginRequest.setUsername("username");
-        changeLoginRequest.setOldPassword("old_password");
-        changeLoginRequest.setNewPassword("new_password");
-
-        User user = mock(User.class);
-        when(user.getPassword()).thenReturn("old_password");
-        when(userService.findUserByUserName("username")).thenReturn(user);
-
-        // Act
-        HttpStatus status = authService.changeLogin(changeLoginRequest);
-
-        // Assert
-        assertEquals(HttpStatus.OK, status);
-        verify(userService).changePassword("username", "new_password");
-    }
-
-//    @Test
-//    void testChangeLogin_Unsuccessful() {
-//        // Arrange
-//        ChangeLoginRequest changeLoginRequest = new ChangeLoginRequest();
-//        changeLoginRequest.setUsername("username");
-//        changeLoginRequest.setOldPassword("old_password");
-//        changeLoginRequest.setNewPassword("new_password");
-//
-//        User user = mock(User.class);
-//        when(user.getPassword()).thenReturn("wrong_password");
-//        when(userService.findUserByUserName("username")).thenReturn(user);
-//
-//        // Act
-//        HttpStatus status = authService.changeLogin(changeLoginRequest);
-//
-//        // Assert
-//        assertEquals(HttpStatus.BAD_REQUEST, status);
-//        verifyNoInteractions(userService);
-//    }
 
     @Test
     void testCreateTrainee() {

@@ -28,7 +28,7 @@ public class AuthService {
     private final JWTProvider provider;
     private final LoginAttemptService loginAttemptService;
 
-    private final PasswordEncoder encoder;
+        private final PasswordEncoder encoder;
 
     public JwtResponse login(LoginRequest request) {
         if (loginAttemptService.isBlocked(request.getUsername())) {
