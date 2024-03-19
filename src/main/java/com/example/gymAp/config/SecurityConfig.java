@@ -34,26 +34,15 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
 @Configuration
 @EnableWebSecurity
 @Slf4j
+@RequiredArgsConstructor
 public class SecurityConfig {
 
-    private UserService userService;
-    private JWTFilter filter;
-    private JWTProvider provider;
+    private final UserService userService;
+    private final JWTFilter filter;
+    private final JWTProvider provider;
 
-    @Autowired
-    public void setProvider(JWTProvider provider) {
-        this.provider = provider;
-    }
 
-    @Autowired
-    public void userService(UserService userService) {
-        this.userService = userService;
-    }
 
-    @Autowired
-    public void setFilter(JWTFilter filter) {
-        this.filter = filter;
-    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {

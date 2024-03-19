@@ -23,7 +23,6 @@ import java.security.SignatureException;
 @RequiredArgsConstructor
 @Slf4j
 public class JWTFilter extends OncePerRequestFilter {
-    private final UserDAO userDAO;
 
     private final JWTProvider jwtProvider;
 

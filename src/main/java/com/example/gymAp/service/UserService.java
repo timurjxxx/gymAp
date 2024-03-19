@@ -28,21 +28,11 @@ import java.util.stream.IntStream;
 @Slf4j
 public class UserService implements UserDetailsService {
 
-    private UserDAO userDAO;
-    private RoleService roleService;
+    private final UserDAO userDAO;
+    private final RoleService roleService;
 
 
 
-    @Autowired
-    public void setUserDAO(UserDAO userDAO) {
-        this.userDAO = userDAO;
-    }
-
-    @Autowired
-
-    public void setRoleService(RoleService roleService) {
-        this.roleService = roleService;
-    }
 
 
 
