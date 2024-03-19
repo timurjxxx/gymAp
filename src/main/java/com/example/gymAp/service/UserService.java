@@ -32,7 +32,6 @@ public class UserService implements UserDetailsService {
     private RoleService roleService;
 
 
-    private PasswordEncoder encoder;
 
     @Autowired
     public void setUserDAO(UserDAO userDAO) {
@@ -45,11 +44,7 @@ public class UserService implements UserDetailsService {
         this.roleService = roleService;
     }
 
-    @Autowired
 
-    public void setEncoder(PasswordEncoder encoder) {
-        this.encoder = encoder;
-    }
 
     @Value("${app.user.password.chars}")
     private String passwordChars;

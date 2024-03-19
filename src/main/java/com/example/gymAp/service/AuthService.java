@@ -92,21 +92,5 @@ public class AuthService {
     }
 
 
-    public String logout(HttpServletRequest request) {
-        String token = provider.extractTokenFromHeader(request.getHeader("Authorization"));
-        log.info("Logout initiated. Token to invalidate: {}", token);
-        if (provider.isTokenValid(token) && token != null) {
-            provider.invalidateToken(token);
-            log.info("Token invalidated successfully.");
-        }
-        HttpSession session = request.getSession(false);
-        if (session != null) {
-            session.invalidate();
-            log.info("Session invalidated successfully.");
-        }
-        log.info("Logged out successfully.");
-        return "Logged out successfully";
-    }
-
 
 }
