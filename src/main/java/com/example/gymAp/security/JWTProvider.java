@@ -21,11 +21,16 @@ public class JWTProvider {
     private final Set<String> invalidatedTokens = new HashSet<>();
 
     public String generateToken(UserDetails userDetails) {
+
+        log.info("Generating token for user '{}'", userDetails.getUsername());
+
         Map<String, Object> claims = new HashMap<>();
         List<String> roleList = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList();
         claims.put("roles", roleList);
+
+
 
         Date issuedDate = new Date();
         Date expiredDate = new Date(issuedDate.getTime() + ACCESS_EXPIRATION);
@@ -48,6 +53,8 @@ public class JWTProvider {
         return getAllClaimsFromToken(token).get("roles", List.class);
     }
     public Claims getAllClaimsFromToken(String token){
+        log.debug("Parsing token: '{}'", token);
+
         return Jwts.parser()
                 .setSigningKey(ACCESS_SECRET)
                 .build()

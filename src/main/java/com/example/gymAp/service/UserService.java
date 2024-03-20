@@ -37,6 +37,7 @@ public class UserService implements UserDetailsService {
     @Transactional(readOnly = true)
     public User findUserByUserName(String username) {
         log.info("Finding user by username: {}", username);
+        log.debug("Base username: {}", username);
 
         return userDAO.findUserByUserName(username).orElseThrow(() -> new UserNotFoundException("User with username " + username + "is not found "));
     }
@@ -46,6 +47,7 @@ public class UserService implements UserDetailsService {
         newUser.setRoles(List.of(roleService.getUserRole()));
         newUser.setUserName(generateUsername(newUser.getFirstName() + "." + newUser.getLastName()));
         log.info("Creating new user: {}", newUser.getUserName());
+        log.debug("User details {}", newUser);
         return userDAO.save(newUser);
     }
 
@@ -55,7 +57,8 @@ public class UserService implements UserDetailsService {
         user.setFirstName(updatedUser.getFirstName());
         user.setLastName(updatedUser.getLastName());
         user.setIsActive(updatedUser.getIsActive());
-        log.info("Updating user: {}", user.getUserName());
+        log.info("Updating user with username: {}", userName);
+        log.debug("UpdatedUser details {}" , user);
         return userDAO.save(user);
     }
 

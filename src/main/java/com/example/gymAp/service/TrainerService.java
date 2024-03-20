@@ -34,6 +34,8 @@ public class TrainerService {
 
     @Transactional
     public Trainer createTrainer(@Valid Trainer trainer, @Valid User user, @NotBlank String trainingTypeName) {
+        log.info("Create trainer with cred {}, {}", trainer, user);
+        log.debug("User credentials {}", user);
         trainer.setUser(userService.createUser(user));
         trainer.setSpecialization(trainingTypeService.findByTrainingName(trainingTypeName));
         return trainerDAO.save(trainer);
@@ -48,10 +50,12 @@ public class TrainerService {
 
     @Transactional
     public Trainer updateTrainer(@NotBlank String username, @Valid Trainer updatedTrainer) throws UserNotFoundException {
+        log.info("Update trainer with username {}", username);
+        log.info("UpdatedTrainer credentials {}", updatedTrainer);
         Trainer trainer = trainerDAO.findTrainerByUserUserName(username).orElseThrow(() -> new UserNotFoundException("Trainer with username " + username + " is not found"));
         trainer.setUser(userService.updateUser(updatedTrainer.getUser().getUserName(), updatedTrainer.getUser()));
-        log.info("Updated trainer with username: {}", username);
-        log.debug("Updated trainer details: {}", trainer);
+        log.info("Saved updatedTrainer {}", trainer);
+        log.debug("Saved trainer credentials {}, {}", trainer, trainer.getUser());
         return trainerDAO.save(trainer);
     }
 

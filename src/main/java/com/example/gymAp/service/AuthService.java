@@ -88,10 +88,12 @@ public class AuthService {
     }
 
     private String encoderPassword(String password) {
+        log.debug("Encrypting password");
         return encoder.encode(password);
     }
 
     private boolean decoderPassword(String rawPassword, String encoderPassword) {
+        log.debug("Decrypting password");
         return encoder.matches(rawPassword, encoderPassword);
     }
 }

@@ -15,8 +15,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import lombok.extern.slf4j.Slf4j;
+
 @RestController
 @RequestMapping(value = "/trainee", produces = MediaType.APPLICATION_JSON_VALUE)
+@Slf4j
 public class TraineeController {
 
     private final TraineeService traineeService;
@@ -30,24 +33,30 @@ public class TraineeController {
 
     @GetMapping("/get_Trainee/{username}")
     public ResponseEntity<String> getTraineeProfile(@PathVariable("username") String username   ) {
+        log.info("Fetching trainee profile for username: {}", username);
         Trainee trainee = traineeService.selectTraineeByUserName(username);
-            return ResponseEntity.ok(trainee + trainee.getTrainers().toString());
+        log.debug("Trainee details: {}", trainee);
+        return ResponseEntity.ok(trainee + trainee.getTrainers().toString());
     }
 
     @PutMapping(value = "/update_Trainee/{username}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> updateTraineeProfile(@PathVariable("username") String username, @RequestBody Trainee trainee) {
+        log.info("Updating trainee profile for username: {}", username);
         Trainee updatedTrainee = traineeService.updateTrainee(trainee.getUser().getUserName(), trainee);
+        log.debug("Updated trainee details: {}", updatedTrainee);
         return ResponseEntity.ok(updatedTrainee.toString() + updatedTrainee.getTrainers().toString());
     }
 
     @DeleteMapping("/delete_Trainee/{username}")
     public ResponseEntity<Void> deleteTraineeProfile(@PathVariable("username") String username) {
+        log.info("Deleting trainee profile for username: {}", username);
         traineeService.deleteTraineeByUserName(username);
         return ResponseEntity.ok().build();
     }
 
     @PutMapping(value = "/updateTrainersList/{username}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> updateTraineeTrainersList(@PathVariable("username") String username, @RequestBody Map<String, Object> jsonData) {
+        log.info("Updating trainers list for trainee with username: {}", username);
         String traineeUsername = (String) jsonData.get("traineeUsername");
         List<String> trainerUsernames = (List<String>) jsonData.get("trainerUsernames");
         Set<Trainer> trainers = new HashSet<>();
@@ -55,13 +64,14 @@ public class TraineeController {
             trainers.add(trainerService.selectTrainerByUserName(item));
         }
         Trainee updatedTrainee = traineeService.updateTraineeTrainersList(traineeUsername, trainers);
+        log.debug("Updated trainee details with new trainers: {}", updatedTrainee);
         return ResponseEntity.ok(updatedTrainee.getTrainers().toString());
     }
 
     @PatchMapping(value = "/change_status/{username}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> activateDeactivateTrainee(@PathVariable("username") String username) {
+        log.info("Activating/deactivating trainee with username: {}", username);
         traineeService.changeStatus(username);
         return ResponseEntity.ok().build();
     }
-
 }

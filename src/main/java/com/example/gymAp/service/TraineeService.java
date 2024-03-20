@@ -37,21 +37,28 @@ public class TraineeService {
 
     @Transactional
     public Trainee createTrainee(@Valid Trainee trainee, @NotNull User user) {
+        log.info("Create trainee with cred {}, {}", trainee, user);
+        log.debug("User credentials {}", user);
         trainee.setUser(userService.createUser(user));
         return traineeDAO.save(trainee);
     }
 
     @Transactional(readOnly = true)
     public Trainee selectTraineeByUserName(@NotBlank String username) throws UserNotFoundException {
+        log.info("Get trainee profile by username {}", username);
         return traineeDAO.findTraineeByUserUserName(username).orElseThrow(() -> new UserNotFoundException("Trainee with username: " + username + " is not found"));
     }
 
     @Transactional
     public Trainee updateTrainee(@NotBlank String username, @Valid Trainee updatedTrainee) throws UserNotFoundException {
+        log.info("Update trainee with username {}", username);
+        log.info("UpdatedTrainee credentials {}", updatedTrainee);
         Trainee trainee = traineeDAO.findTraineeByUserUserName(username).orElseThrow(() -> new UserNotFoundException("Trainee with username: " + username + " is not found"));
         trainee.setDateOfBirth(updatedTrainee.getDateOfBirth());
         trainee.setAddress(updatedTrainee.getAddress());
         trainee.setUser(userService.updateUser(updatedTrainee.getUser().getUserName(), updatedTrainee.getUser()));
+        log.info("Saved updatedTrainee {}", trainee);
+        log.debug("Saved trainee credentials {}, {}", trainee, trainee.getUser());
         return traineeDAO.save(trainee);
     }
 

@@ -22,6 +22,8 @@ public class LoginAttemptService {
         if (attemptsCache.getOrDefault(username, 0) >= MAX_ATTEMPTS) {
             blockList.put(username, System.currentTimeMillis() + BLOCK_DURATION);
             log.warn("User {} is blocked due to too many failed login attempts", username);
+        } else {
+            log.debug("Failed login attempt for user {}", username);
         }
     }
 
