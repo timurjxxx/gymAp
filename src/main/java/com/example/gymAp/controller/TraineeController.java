@@ -28,19 +28,10 @@ public class TraineeController {
         this.trainerService = trainerService;
     }
 
-
-
     @GetMapping("/get_Trainee/{username}")
     public ResponseEntity<String> getTraineeProfile(@PathVariable("username") String username   ) {
-
         Trainee trainee = traineeService.selectTraineeByUserName(username);
-        if (trainee != null) {
             return ResponseEntity.ok(trainee + trainee.getTrainers().toString());
-
-        } else {
-            throw new EntityNotFoundException("Not found");
-        }
-
     }
 
     @PutMapping(value = "/update_Trainee/{username}", consumes = MediaType.APPLICATION_JSON_VALUE)

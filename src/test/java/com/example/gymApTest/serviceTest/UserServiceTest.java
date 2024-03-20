@@ -6,6 +6,7 @@ import com.example.gymAp.model.Roles;
 import com.example.gymAp.model.User;
 import com.example.gymAp.service.RoleService;
 import com.example.gymAp.service.UserService;
+import io.micrometer.core.instrument.config.validate.ValidationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -252,6 +253,28 @@ public class UserServiceTest {
         assertEquals("ROLE_USER", userDetails.getAuthorities().iterator().next().getAuthority());
 
         verify(userDAO, times(1)).findUserByUserName(username);
+    }
+    @Test
+    public void testFindUserByUserName_Success() {
+        // Arrange
+        String username = "testuser";
+        User expectedUser = new User();
+        expectedUser.setUserName(username);
+        when(userDAO.findUserByUserName(username)).thenReturn(Optional.of(expectedUser));
+        // Act
+        User actualUser = userService.findUserByUserName(username);
+
+        // Assert
+        assertEquals(expectedUser, actualUser);
+    }
+
+    @Test
+    public void testFindUserByUserName_NotFound() {
+        // Arrange
+        String username = "nonexistentuser";
+
+        // Act & Assert
+        assertThrows(UserNotFoundException.class, () -> userService.findUserByUserName(username));
     }
 
 }

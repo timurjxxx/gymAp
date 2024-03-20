@@ -6,12 +6,18 @@ import com.example.gymAp.service.TraineeService;
 import com.example.gymAp.service.TrainerService;
 import com.example.gymAp.service.TrainingService;
 import com.example.gymAp.service.TrainingTypeService;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.metamodel.SingularAttribute;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -153,4 +159,163 @@ class TrainingServiceTest {
 
     }
 
+
+
+    @Test
+    public void testGetTrainerTrainingsByCriteria_WithTrainingName() {
+        // Arrange
+        String trainerUsername = "trainer1";
+        String trainingName = "Training 1";
+        TrainingSearchCriteria criteria = new TrainingSearchCriteria();
+        criteria.setTrainingName(trainingName);
+
+        Trainer trainer = new Trainer();
+        User user = new User();
+        trainer.setUser(user);
+        trainer.getUser().setUserName(trainerUsername);
+
+        Training training = new Training();
+        training.setTrainingName(trainingName);
+        List<Training> expectedTrainings = new ArrayList<>();
+        expectedTrainings.add(training);
+
+        when(trainerService.selectTrainerByUserName(trainerUsername)).thenReturn(trainer);
+        when(trainingDAO.findAll((Specification<Training>) any())).thenReturn(expectedTrainings);
+
+        List<Training> actualTrainings = trainingService.getTrainerTrainingsByCriteria(trainerUsername, criteria);
+
+        assertEquals(expectedTrainings, actualTrainings);
+    }
+
+
+    @Test
+    public void testGetTrainerTrainingsByCriteria_WithStartDateAndEndDate() {
+        String trainerUsername = "trainer1";
+        LocalDate startDate = LocalDate.now();
+        LocalDate endDate = startDate.plusDays(7);
+        TrainingSearchCriteria criteria = new TrainingSearchCriteria();
+        criteria.setTrainingStartDate(startDate);
+        criteria.setTrainingEndDate(endDate);
+
+        Trainer trainer = new Trainer();
+        User user = new User();
+        trainer.setUser(user);
+        trainer.getUser().setUserName(trainerUsername);
+
+        Training training1 = new Training();
+        training1.setTrainingDate(startDate);
+        Training training2 = new Training();
+        training2.setTrainingDate(endDate);
+
+        List<Training> expectedTrainings = new ArrayList<>();
+        expectedTrainings.add(training1);
+        expectedTrainings.add(training2);
+
+        when(trainerService.selectTrainerByUserName(trainerUsername)).thenReturn(trainer);
+        when(trainingDAO.findAll((Specification<Training>) any())).thenReturn(expectedTrainings);
+
+        List<Training> actualTrainings = trainingService.getTrainerTrainingsByCriteria(trainerUsername, criteria);
+
+        assertEquals(expectedTrainings, actualTrainings);
+    }
+
+    @Test
+    public void testGetTrainerTrainingsByCriteria_WithTrainingDuration() {
+        String trainerUsername = "trainer1";
+        int trainingDuration = 60;
+        TrainingSearchCriteria criteria = new TrainingSearchCriteria();
+        criteria.setTrainingDuration(trainingDuration);
+
+        Trainer trainer = new Trainer();
+        User user = new User();
+        trainer.setUser(user);
+        trainer.getUser().setUserName(trainerUsername);
+
+        Training training1 = new Training();
+        training1.setTrainingDuration(trainingDuration);
+        Training training2 = new Training();
+        training2.setTrainingDuration(trainingDuration);
+
+        List<Training> expectedTrainings = new ArrayList<>();
+        expectedTrainings.add(training1);
+        expectedTrainings.add(training2);
+
+        when(trainerService.selectTrainerByUserName(trainerUsername)).thenReturn(trainer);
+        when(trainingDAO.findAll((Specification<Training>) any())).thenReturn(expectedTrainings);
+
+        List<Training> actualTrainings = trainingService.getTrainerTrainingsByCriteria(trainerUsername, criteria);
+
+        assertEquals(expectedTrainings, actualTrainings);
+    }
+
+    @Test
+    public void testGetTrainerTrainingsByCriteria_WithTrainingTypes() {
+        String trainerUsername = "trainer1";
+        TrainingType trainingType = new TrainingType();
+        trainingType.setTrainingTypeName("Cardio");
+        TrainingSearchCriteria criteria = new TrainingSearchCriteria();
+        criteria.setTrainingTypes(trainingType);
+
+        Trainer trainer = new Trainer();
+        User user = new User();
+        trainer.setUser(user);
+        trainer.getUser().setUserName(trainerUsername);
+
+        Training training1 = new Training();
+        training1.setTrainingTypes(trainingType);
+        Training training2 = new Training();
+        training2.setTrainingTypes(trainingType);
+
+        List<Training> expectedTrainings = new ArrayList<>();
+        expectedTrainings.add(training1);
+        expectedTrainings.add(training2);
+
+        when(trainerService.selectTrainerByUserName(trainerUsername)).thenReturn(trainer);
+        when(trainingDAO.findAll((Specification<Training>) any())).thenReturn(expectedTrainings);
+
+        List<Training> actualTrainings = trainingService.getTrainerTrainingsByCriteria(trainerUsername, criteria);
+
+        assertEquals(expectedTrainings, actualTrainings);
+    }
+
+
+    @Test
+    public void testGetTrainerTrainingsByCriteria1() {
+        // Arrange
+        String trainerUsername = "trainer1";
+        String trainingName = "Training 1";
+        LocalDate startDate = LocalDate.now();
+        LocalDate endDate = startDate.plusDays(7);
+        int trainingDuration = 60; // minutes
+
+        Trainer trainer = new Trainer();
+        User user = new User();
+        trainer.setUser(user);
+        trainer.getUser().setUserName(trainerUsername);
+
+        TrainingSearchCriteria criteria = new TrainingSearchCriteria();
+        criteria.setTrainingName(trainingName);
+        criteria.setTrainingStartDate(startDate);
+        criteria.setTrainingEndDate(endDate);
+        criteria.setTrainingDuration(trainingDuration);
+
+        Root<Training> root = mock(Root.class);
+        CriteriaQuery<?> query = mock(CriteriaQuery.class);
+        CriteriaBuilder cb = mock(CriteriaBuilder.class);
+        List<Predicate> predicates = new ArrayList<>();
+
+        when(trainerService.selectTrainerByUserName(trainerUsername)).thenReturn(trainer);
+        when(cb.equal(root.get("trainer"), trainer)).thenReturn(mock(Predicate.class));
+        when(cb.equal(root.get("trainingName"), trainingName)).thenReturn(mock(Predicate.class));
+        when(cb.between(root.get("trainingDate"), startDate, endDate)).thenReturn(mock(Predicate.class));
+        when(cb.equal(root.get("trainingDuration"), trainingDuration)).thenReturn(mock(Predicate.class));
+        when(cb.and(any())).thenReturn(mock(Predicate.class));
+        when(root.get((SingularAttribute<? super Training, Object>) any())).thenReturn(null);
+
+        // Act
+        trainingService.getTrainerTrainingsByCriteria(trainerUsername, criteria);
+
+        // Assert
+        verify(trainingDAO, times(1)).findAll((Specification<Training>) any());
+    }
 }

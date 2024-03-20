@@ -26,15 +26,8 @@ public class TrainerController {
 
     @GetMapping("/get_Trainer/{username}")
     public ResponseEntity<String> getTrainerProfile(@PathVariable("username") String username) {
-
         Trainer trainer = trainerService.selectTrainerByUserName(username);
-        if (trainer != null) {
             return ResponseEntity.ok(trainer.toString());
-
-        } else {
-            throw new EntityNotFoundException("Not found");
-        }
-
     }
 
     @PutMapping(value = "/update_Trainer/{username}", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -45,15 +38,8 @@ public class TrainerController {
 
     @GetMapping("/get_Trainers/{username}")
     public ResponseEntity<String> getNotAssignedActiveTrainers(@PathVariable("username") String username) {
-
         List<Trainer> trainer = trainerService.getNotAssignedActiveTrainers(username);
-        if (trainer != null) {
             return ResponseEntity.ok(trainer.toString());
-
-        } else {
-            throw new EntityNotFoundException("Not found");
-        }
-
     }
 
     @PatchMapping(value = "/change_status/{username}", consumes = MediaType.APPLICATION_JSON_VALUE)

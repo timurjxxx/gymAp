@@ -1,27 +1,25 @@
 package com.example.gymApTest.controllerTest;
 
 import com.example.gymAp.controller.TrainerController;
+import com.example.gymAp.model.Trainer;
+import com.example.gymAp.model.TrainingType;
+import com.example.gymAp.model.User;
+import com.example.gymAp.service.TrainerService;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import com.example.gymAp.controller.TrainingController;
-import com.example.gymAp.dao.TrainingDAO;
-import com.example.gymAp.model.*;
-import com.example.gymAp.service.TraineeService;
-import com.example.gymAp.service.TrainerService;
-import com.example.gymAp.service.TrainingService;
-import com.example.gymAp.service.TrainingTypeService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 public class TrainerControllerTest {
@@ -96,4 +94,6 @@ public class TrainerControllerTest {
         ResponseEntity<Void> response = trainerController.activateDeactivateTrainer("username");
         assertEquals(200, response.getStatusCodeValue());
     }
+
+
 }

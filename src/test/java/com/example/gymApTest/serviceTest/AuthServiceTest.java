@@ -24,8 +24,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Collections;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -127,6 +126,60 @@ public class AuthServiceTest {
         // Assert
         assertEquals(HttpStatus.OK, status);
         verify(userService, times(1)).changePassword(request.getUsername(), request.getNewPassword());
+    }
+
+
+
+    @Test
+    public void testLogin_UserNotFound() {
+        // Arrange
+        LoginRequest request = new LoginRequest("nonExistingUser", "password");
+
+        when(loginAttemptService.isBlocked("nonExistingUser")).thenReturn(false);
+        when(userService.loadUserByUsername("nonExistingUser")).thenThrow(new UsernameNotFoundException("User not found"));
+
+        // Act and Assert
+        BadCredentialsException exception = assertThrows(BadCredentialsException.class, () -> {
+            authService.login(request);
+        });
+
+        assertEquals("Invalid username or password", exception.getMessage());
+        verify(loginAttemptService, times(1)).loginFailed("nonExistingUser");
+    }
+    @Test
+    public void testLogin_IncorrectPassword() {
+        // Arrange
+        LoginRequest request = new LoginRequest("existingUser", "incorrectPassword");
+        UserDetails userDetails = new org.springframework.security.core.userdetails.User("existingUser", "hashedPassword", Collections.emptyList());
+
+        when(loginAttemptService.isBlocked("existingUser")).thenReturn(false);
+        when(userService.loadUserByUsername("existingUser")).thenReturn(userDetails);
+        when(encoder.matches("incorrectPassword", userDetails.getPassword())).thenReturn(false);
+
+        // Act and Assert
+        BadCredentialsException exception = assertThrows(BadCredentialsException.class, () -> {
+            authService.login(request);
+        });
+
+        assertEquals("Invalid username or password", exception.getMessage());
+        verify(loginAttemptService, times(1)).loginFailed("existingUser");
+    }
+
+
+    @Test
+    public void testLogin_UserBlocked() {
+        // Arrange
+        LoginRequest request = new LoginRequest("blockedUser", "password");
+
+        when(loginAttemptService.isBlocked("blockedUser")).thenReturn(true);
+
+        // Act and Assert
+        BadCredentialsException exception = assertThrows(BadCredentialsException.class, () -> {
+            authService.login(request);
+        });
+
+        assertEquals("Your account is temporarily blocked. Please try again later.", exception.getMessage());
+        verify(loginAttemptService, never()).loginFailed("blockedUser");
     }
 
 }
