@@ -1,8 +1,10 @@
 package com.example.gymAp.controller;
 
+import com.example.gymAp.model.TrainerWorkloadRequest;
 import com.example.gymAp.model.Training;
 import com.example.gymAp.model.TrainingSearchCriteria;
 import com.example.gymAp.service.TrainingService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -11,18 +13,17 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @RestController
 @RequestMapping(value = "/training", produces = MediaType.APPLICATION_JSON_VALUE)
 @Slf4j
+@RequiredArgsConstructor
 public class TrainingController {
 
     private final TrainingService trainingService;
-
-    @Autowired
-    public TrainingController(TrainingService trainingService) {
-        this.trainingService = trainingService;
-    }
+    private final WebClient.Builder webClient;
 
     @PostMapping(value = "/create_training", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> createTraining(@RequestBody Training training) {
@@ -30,8 +31,25 @@ public class TrainingController {
         String traineeName = training.getTrainee().getUser().getUserName();
         String trainingTypeName = training.getTrainingTypes().getTrainingTypeName();
         log.info("Creating training with trainer: {}, trainee: {}, training type: {}", trainerName, traineeName, trainingTypeName);
-        trainingService.addTraining(training, trainerName, traineeName, trainingTypeName);
+        Training training1 = trainingService.addTraining(training, trainerName, traineeName, trainingTypeName);
         log.debug("Training created successfully");
+//        TrainerWorkloadRequest request = TrainerWorkloadRequest.builder()
+//                .trainerFirstname()
+//                .trainerLastname()
+//                .trainerUsername()
+//                .isActive()
+//                .trainingDuration()
+//                .trainingDate()
+//                .build();
+//        webClient.build()
+//                .post()
+//                .uri("http://localhost:8082/updateWorkLoad/update")
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .body(BodyInserters.fromValue(training))
+//                .retrieve()
+//                .bodyToMono(Void.class)
+//                .subscribe();
+        log.info("HEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEER TrainerWorkLoad request {}", training1.getTrainer());
         return ResponseEntity.ok().build();
     }
 
